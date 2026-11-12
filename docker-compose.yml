@@ -1,0 +1,12 @@
+services:
+  iot-solar:
+    build: .
+    image: iot-solar:latest
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/opt/iot-solar/data
+      - ./config:/etc/iot-solar
+    environment:
+      - TZ=Europe/Rome
