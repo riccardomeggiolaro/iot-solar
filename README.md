@@ -1,4 +1,7 @@
-# IoT-Solar
+# KINETRA Energia (iot-solar)
+
+Software di monitoraggio della famiglia **KINETRA**, con lo stesso stile di KINETRA Pesatura (iot-weight).
+Il nome "Energia", invece di "Fotovoltaico", lascia spazio alle estensioni previste: batterie, colonnine, consumi aziendali.
 
 Monitoraggio intelligente di impianti fotovoltaici per **PMI, aziende agricole e installatori**
 (impianti da 20 a 500 kWp, anche con inverter di marche diverse).
@@ -19,7 +22,7 @@ stima **quanti euro si stanno perdendo**, così il manutentore sa subito dove in
   dispositivo offline, inverter in FAULT, sovratemperatura, rendimento sotto l'atteso o sotto i pari,
   calo uniforme di tutto l'impianto (sporco generalizzato o sensore da pulire).
 - **Perdita in €** per ogni allarme e per la giornata.
-- **Dashboard web** che funziona anche senza internet, e **API REST**.
+- **Interfaccia web** con la stessa struttura e lo stesso stile di KINETRA Pesatura: menu laterale, barra di stato, tema chiaro/scuro, impostazioni a schede. Funziona anche senza internet, ed è disponibile un'**API REST**.
 - **Utenti con livelli** (sola lettura, utente, amministratore, super admin) come iot-weight.
 - **Configurazione dal web**: impianto, inverter (con pulsante *Prova connessione*), soglie degli
   allarmi. Le modifiche si applicano senza riavviare.
@@ -39,11 +42,12 @@ python main.py
 ```
 
 Apri <http://localhost:8080> e accedi con `admin` / `admin`: al primo accesso viene chiesto di cambiare la password.
+Lo stesso `admin` / `admin` vale con `docker compose up -d --build` se non imposti `IOT_SOLAR_ADMIN_PASSWORD`.
 Al primo avvio viene creato `config.json` da `config.example.json`, con un impianto **simulato** da 180 kWp
-(4 inverter e un piranometro). Dal riquadro **Simulatore** in fondo alla dashboard puoi staccare stringhe,
+(4 inverter e un piranometro). Dal riquadro **Simulatore** in fondo alla Dashboard puoi staccare stringhe,
 sporcare moduli, mandare un inverter in FAULT o scollegarlo, e vedere comparire gli allarmi.
 
-Per vedere un'intera giornata in pochi minuti: Configurazione → Simulatore → velocità 120, ora di partenza 6.
+Per vedere un'intera giornata in pochi minuti: Impostazioni → Simulatore → velocità 120, ora di partenza 6.
 
 Con Docker partendo dal codice sorgente: `docker compose up -d --build`.
 

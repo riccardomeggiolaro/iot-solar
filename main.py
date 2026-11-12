@@ -1,5 +1,5 @@
 """
-IoT-Solar: monitoraggio impianti fotovoltaici.
+KINETRA Energia (iot-solar): monitoraggio impianti fotovoltaici.
 
 Avvia nello stesso processo asyncio il simulatore (se abilitato), il ciclo di
 monitoraggio e l'API REST con la dashboard.
@@ -31,7 +31,7 @@ async def main(config_path=None):
 	logging.basicConfig(level=config.get("log_level", "INFO"),
 						format="%(asctime)s %(levelname)-7s %(name)-10s %(message)s")
 	logging.getLogger("pymodbus").setLevel(logging.CRITICAL)
-	logging.info("IoT-Solar %s – configurazione %s, dati %s", runtime.version, runtime.config_path, runtime.data_dir)
+	logging.info("KINETRA Energia %s – configurazione %s, dati %s", runtime.version, runtime.config_path, runtime.data_dir)
 
 	initial = runtime.auth.ensure_admin(os.environ.get("IOT_SOLAR_ADMIN_PASSWORD"))
 	if initial:

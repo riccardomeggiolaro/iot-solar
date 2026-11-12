@@ -1,0 +1,18 @@
+/* Pagina di accesso */
+.login { min-height: 100vh; display: grid; place-items: center; padding: 16px; background: var(--bg); }
+.login-card { width: 100%; max-width: 380px; padding: 28px 24px; display: flex; flex-direction: column; gap: 14px; }
+/* Logo del prodotto: pittogramma + KINETRA / — ENERGIA (come nel marchio aziendale) */
+.product-logo { display: flex; align-items: center; gap: 14px; margin-bottom: 4px; }
+.product-logo img { width: 56px; height: 56px; border-radius: 14px; }
+.product-name { line-height: 1; color: #0f1e3d; }
+.product-name b { display: block; font-size: 24px; font-weight: 800; letter-spacing: .14em; }
+.product-name span { display: flex; align-items: center; gap: 7px; margin-top: 6px; font-size: 13px; font-weight: 700; letter-spacing: .24em; color: #f26a1b; }
+.product-name span::before { content: ""; width: 16px; height: 3px; background: #f26a1b; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .product-name { color: #fff; } }
+:root[data-theme="dark"] .product-name { color: #fff; }
+.login-card h1 { font-size: 22px; font-weight: 700; }
+.login-card .muted { margin-top: -8px; }
+.login-field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text-muted); }
+.login-field .input { width: 100%; }
+.login-error { background: var(--err-bg); color: var(--err); border-radius: 8px; padding: 8px 12px; font-size: 13px; font-weight: 600; }
+.login-submit { width: 100%; justify-content: center; margin-top: 4px; }

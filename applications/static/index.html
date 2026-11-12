@@ -1,205 +1,55 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>IoT-Solar</title>
-<link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KINETRA Energia</title>
+  <link rel="icon" type="image/svg+xml" href="/img/logo.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+  <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+  <link rel="stylesheet" href="/css/app.css">
+  <link rel="stylesheet" href="/css/data.css">
+  <link rel="stylesheet" href="/css/energia.css">
 </head>
 <body>
+  <div class="app">
+    <nav class="sidebar" aria-label="Menu principale">
+      <img class="brand" src="/img/logo.svg" alt="KINETRA Energia" title="KINETRA Energia" width="44" height="44">
+      <a class="nav-item" href="#/dashboard" data-route="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="3"/><path d="M12 1.5v1M5.5 7h-1M19.5 7h-1M7.4 2.4l.7.7M16.6 2.4l-.7.7"/><path d="M5 21l2-7h10l2 7zM6 17.5h12M10.3 14l-.8 7M13.7 14l.8 7"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="#/allarmi" data-route="allarmi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>
+        Allarmi
+      </a>
+      <a class="nav-item" href="#/report" data-route="report">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 17v-3M12 17V9M16 17v-5"/></svg>
+        Report
+      </a>
+      <div class="spacer"></div>
+      <a class="nav-item" href="#/impostazioni" data-route="impostazioni">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+        Impostazioni
+      </a>
+    </nav>
 
-<!-- ===== Login ===== -->
-<section id="view-login" class="login" hidden>
-	<form class="card" id="login-form">
-		<div class="brand"><div class="sun"></div>IoT-Solar</div>
-		<label class="field">Nome utente<input name="username" autocomplete="username" required autofocus></label>
-		<label class="field">Password<input name="password" type="password" autocomplete="current-password" required></label>
-		<div id="login-error" class="notice err" hidden></div>
-		<button class="primary" type="submit">Accedi</button>
-	</form>
-</section>
+    <header class="topbar">
+      <h1 id="page-title">Dashboard</h1>
+      <div class="status-strip" id="status-strip" aria-label="Stato impianto"></div>
+      <button class="icon-btn" id="theme-toggle" title="Tema chiaro/scuro" aria-label="Cambia tema">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      <button class="icon-btn" id="logout" title="Esci" aria-label="Esci">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      </button>
+    </header>
 
-<!-- ===== Cambio password ===== -->
-<section id="view-password" class="login" hidden>
-	<form class="card" id="password-form">
-		<div class="brand"><div class="sun"></div>Nuova password</div>
-		<div class="notice info" id="password-forced">Per sicurezza scegli una nuova password prima di continuare.</div>
-		<label class="field">Password attuale<input name="old_password" type="password" autocomplete="current-password" required></label>
-		<label class="field">Nuova password (almeno 6 caratteri)<input name="new_password" type="password" autocomplete="new-password" minlength="6" required></label>
-		<label class="field">Ripeti la nuova password<input name="repeat" type="password" autocomplete="new-password" minlength="6" required></label>
-		<div id="password-error" class="notice err" hidden></div>
-		<div class="row" style="justify-content:flex-end"><button type="button" id="password-cancel">Annulla</button><button class="primary" type="submit">Salva password</button></div>
-	</form>
-</section>
+    <main class="main" id="view" tabindex="-1"></main>
+  </div>
 
-<!-- ===== Applicazione ===== -->
-<div id="app" hidden>
-	<header>
-		<div class="sun"></div>
-		<h1 id="plant-name">IoT-Solar</h1>
-		<nav id="nav">
-			<a href="#/dashboard" data-view="dashboard">Impianto</a>
-			<a href="#/report" data-view="report">Report</a>
-			<a href="#/config" data-view="config" data-level="3">Configurazione</a>
-			<a href="#/users" data-view="users" data-level="3">Utenti</a>
-		</nav>
-		<div class="userbox">
-			<span id="user-label"></span>
-			<button id="btn-password" title="Cambia password">Password</button>
-			<button id="btn-logout">Esci</button>
-		</div>
-	</header>
+  <div class="toasts" id="toasts" aria-live="polite"></div>
 
-	<!-- Dashboard -->
-	<main id="view-dashboard" hidden>
-		<div id="sim-banner" class="notice info" hidden>Stai vedendo un <b>impianto simulato</b>. Per collegare gli inverter reali vai su Configurazione e disattiva il simulatore.</div>
-		<section class="kpis">
-			<div class="card kpi"><div class="label">Potenza ora</div><div class="value" id="k-power">–</div><div class="sub" id="k-power-sub"></div></div>
-			<div class="card kpi"><div class="label">Energia oggi</div><div class="value" id="k-energy">–</div><div class="sub" id="k-energy-sub"></div></div>
-			<div class="card kpi loss"><div class="label">Perdita stimata oggi</div><div class="value" id="k-loss">–</div><div class="sub" id="k-loss-sub"></div></div>
-			<div class="card kpi"><div class="label">Irraggiamento</div><div class="value" id="k-irr">–</div><div class="sub">sul piano dei moduli</div></div>
-		</section>
-		<section class="grid2">
-			<div class="card scroll">
-				<h2>Inverter</h2>
-				<table>
-					<thead><tr><th>Nome</th><th>Stato</th><th>Potenza</th><th>Reale / atteso</th><th>Oggi</th><th>Temp.</th></tr></thead>
-					<tbody id="devices"></tbody>
-				</table>
-			</div>
-			<div class="card">
-				<h2>Allarmi attivi</h2>
-				<div id="alarms"></div>
-			</div>
-		</section>
-		<section class="card">
-			<div class="row" style="margin-bottom:8px">
-				<h2 style="margin:0" id="chart-title">Storico</h2>
-				<div class="legend"><span style="--c:var(--accent)">Reale</span><span style="--c:var(--exp)">Atteso</span></div>
-			</div>
-			<svg id="chart" viewBox="0 0 1000 260" width="100%" preserveAspectRatio="none" style="height:260px"></svg>
-		</section>
-		<section class="card" id="sim" hidden>
-			<h2>Simulatore – inietta un guasto</h2>
-			<div class="row">
-				<select id="sim-dev"></select>
-				<label class="small muted">Sporco <input type="number" id="sim-soiling" min="0" max="1" step="0.05" value="0" style="width:80px"></label>
-				<label class="small muted">Stringhe perse <input type="number" id="sim-string" min="0" max="1" step="0.1" value="0" style="width:80px"></label>
-				<label class="small muted"><input type="checkbox" id="sim-fault"> FAULT</label>
-				<label class="small muted"><input type="checkbox" id="sim-offline"> Offline</label>
-				<button id="sim-apply" data-level="3">Applica</button>
-			</div>
-			<div class="small muted" id="sim-state" style="margin-top:8px"></div>
-		</section>
-	</main>
-
-	<!-- Report -->
-	<main id="view-report" hidden>
-		<section class="card">
-			<div class="row">
-				<h2 style="margin:0">Report mensile</h2>
-				<input type="month" id="report-month">
-				<button class="primary" id="report-pdf">Scarica PDF</button>
-			</div>
-		</section>
-		<section class="kpis" id="report-kpis"></section>
-		<section class="card">
-			<div class="row" style="margin-bottom:8px">
-				<h2 style="margin:0">Produzione giornaliera</h2>
-				<div class="legend"><span style="--c:var(--accent)">Prodotta (kWh)</span><span style="--c:var(--exp)">Attesa (kWh)</span></div>
-			</div>
-			<svg id="report-chart" viewBox="0 0 1000 220" width="100%" preserveAspectRatio="none" style="height:220px"></svg>
-		</section>
-		<section class="card scroll">
-			<h2>Dettaglio inverter</h2>
-			<table>
-				<thead><tr><th>Inverter</th><th>kWp</th><th>Prodotta</th><th>kWh/kWp</th><th>Rendimento</th><th>Persa</th><th>Allarmi</th></tr></thead>
-				<tbody id="report-inverters"></tbody>
-			</table>
-		</section>
-	</main>
-
-	<!-- Configurazione -->
-	<main id="view-config" hidden>
-		<div id="config-msg" class="notice" hidden></div>
-		<section class="card">
-			<h2>Impianto</h2>
-			<div class="form">
-				<label class="field">Nome impianto<input data-cfg="plant.name"></label>
-				<label class="field">Cliente (per il report)<input data-cfg="plant.owner"></label>
-				<label class="field">Indirizzo<input data-cfg="plant.address"></label>
-				<label class="field">Latitudine<input type="number" step="0.0001" data-cfg="plant.latitude"></label>
-				<label class="field">Longitudine<input type="number" step="0.0001" data-cfg="plant.longitude"></label>
-				<label class="field">Prezzo energia (€/kWh)<input type="number" step="0.001" data-cfg="plant.energy_price_eur_kwh"></label>
-				<label class="field">Fuso orario<input data-cfg="plant.timezone"></label>
-			</div>
-		</section>
-		<section class="card scroll">
-			<div class="row" style="justify-content:space-between">
-				<h2 style="margin:0">Dispositivi</h2>
-				<div class="row"><button id="add-inverter">+ Inverter</button><button id="add-sensor">+ Sensore irraggiamento</button></div>
-			</div>
-			<p class="small muted">Sull'inverter va attivato Modbus TCP (SunSpec). La porta è di solito 502; l'unit id è l'indirizzo Modbus del dispositivo.</p>
-			<table>
-				<thead><tr><th>Nome</th><th>Tipo</th><th>Indirizzo IP</th><th>Porta</th><th>Unit id</th><th>kWp</th><th></th></tr></thead>
-				<tbody id="cfg-devices"></tbody>
-			</table>
-		</section>
-		<section class="card">
-			<h2>Allarmi e analisi</h2>
-			<div class="form">
-				<label class="field">Scostamento dall'atteso (0,20 = 20%)<input type="number" step="0.01" data-cfg="analysis.expected_threshold"></label>
-				<label class="field">Scostamento dagli altri inverter<input type="number" step="0.01" data-cfg="analysis.peer_threshold"></label>
-				<label class="field">Irraggiamento minimo per valutare (W/m²)<input type="number" data-cfg="analysis.min_irradiance"></label>
-				<label class="field">Rapporto atteso impianto sano (derate)<input type="number" step="0.01" data-cfg="analysis.derate"></label>
-				<label class="field">Sovratemperatura inverter (°C)<input type="number" data-cfg="analysis.overtemp_c"></label>
-				<label class="field">Letture consecutive prima dell'allarme<input type="number" data-cfg="analysis.persist_cycles"></label>
-				<label class="field">Letture fallite prima di "offline"<input type="number" data-cfg="analysis.offline_after_failures"></label>
-				<label class="field">Intervallo di lettura (s)<input type="number" data-cfg="polling.interval_s"></label>
-				<label class="field">Webhook notifiche (URL)<input data-cfg="alarms.webhook_url" placeholder="https://..."></label>
-				<label class="field">Conservazione storico (giorni)<input type="number" data-cfg="database.retention_days"></label>
-			</div>
-		</section>
-		<section class="card">
-			<h2>Simulatore</h2>
-			<div class="form">
-				<label class="field">Attivo<select data-cfg="simulator.enabled" data-type="bool"><option value="true">Sì</option><option value="false">No</option></select></label>
-				<label class="field">Velocità del tempo (1 = reale)<input type="number" step="1" data-cfg="simulator.speed"></label>
-				<label class="field">Ora di partenza (vuoto = adesso)<input type="number" step="0.5" data-cfg="simulator.start_hour" data-type="optnum"></label>
-				<label class="field">Porta Modbus<input type="number" data-cfg="simulator.port"></label>
-			</div>
-			<p class="small muted">Con il simulatore attivo i dispositivi devono puntare a 127.0.0.1 e alla porta del simulatore.</p>
-		</section>
-		<div class="actions"><button id="config-reload">Annulla modifiche</button><button class="primary" id="config-save">Salva e applica</button></div>
-	</main>
-
-	<!-- Utenti -->
-	<main id="view-users" hidden>
-		<div id="users-msg" class="notice" hidden></div>
-		<section class="card scroll">
-			<h2>Utenti</h2>
-			<table>
-				<thead><tr><th>Utente</th><th>Descrizione</th><th>Livello</th><th></th></tr></thead>
-				<tbody id="users-list"></tbody>
-			</table>
-		</section>
-		<section class="card">
-			<h2>Nuovo utente</h2>
-			<form class="form" id="user-form">
-				<label class="field">Nome utente<input name="username" required></label>
-				<label class="field">Descrizione<input name="description"></label>
-				<label class="field">Livello<select name="level" id="user-level"></select></label>
-				<label class="field">Password iniziale<input name="password" type="password" minlength="6" required></label>
-				<div class="row" style="align-items:end"><button class="primary" type="submit">Crea utente</button></div>
-			</form>
-			<p class="small muted">Al primo accesso il nuovo utente dovrà cambiare la password.<br>
-				Sola lettura: vede impianto e report · Utente: prende in carico gli allarmi · Amministratore: configurazione e utenti · Super admin: anche gli amministratori.</p>
-		</section>
-	</main>
-
-	<footer id="footer"></footer>
-</div>
-
-<script src="/static/app.js"></script>
+  <script type="module" src="/js/app.js"></script>
 </body>
 </html>

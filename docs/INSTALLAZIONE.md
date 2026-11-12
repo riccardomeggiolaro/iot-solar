@@ -1,6 +1,6 @@
-# Installazione di IoT-Solar
+# Installazione di KINETRA Energia
 
-IoT-Solar gira in un container Docker su:
+KINETRA Energia gira in un container Docker su:
 - **Linux**: Debian, Ubuntu, Raspberry Pi OS; PC e mini PC x86 oppure Raspberry Pi 4/5;
 - **Windows 10/11**, con Docker Desktop.
 
@@ -48,13 +48,13 @@ Per l'avvio automatico all'accensione: Docker Desktop → Settings → General �
 
 1. Apri `http://<indirizzo-del-PC>:8080`.
 2. Accedi con l'utente `admin` e la password mostrata dall'installer. Ti verrà chiesto di cambiarla.
-3. Al primo avvio l'impianto è **simulato**. Vai su **Configurazione**:
-   - inserisci i dati dell'impianto: nome, cliente, coordinate, prezzo dell'energia;
-   - in **Dispositivi** elimina quelli simulati e aggiungi gli inverter reali (IP, porta 502, unit id, kWp);
-     con **Prova** verifichi subito la comunicazione;
-   - in **Simulatore** imposta *Attivo: No*;
-   - premi **Salva e applica**: non serve riavviare.
-4. In **Utenti** crea gli accessi per il cliente (*Sola lettura*) e per i tecnici (*Utente*).
+3. Al primo avvio l'impianto è **simulato**. Vai su **Impostazioni**:
+   - nella scheda **Impianto** inserisci nome, cliente, coordinate e prezzo dell'energia;
+   - nella scheda **Dispositivi** elimina quelli simulati e aggiungi gli inverter reali (IP, porta 502, unit id, kWp):
+     con **Prova connessione** verifichi subito la comunicazione;
+   - nella scheda **Simulatore** spegni l'interruttore e premi **Salva**.
+   Ogni modifica si applica subito, senza riavviare.
+4. Nella scheda **Utenti** crea gli accessi per il cliente (*Sola lettura*) e per i tecnici (*Utente*).
 
 ### Abilitare Modbus TCP sugli inverter
 
@@ -101,7 +101,7 @@ Basta copiare le due cartelle persistenti: `/etc/iot-solar` e `/var/opt/iot-sola
 
 ## Password admin dimenticata
 
-Un altro super admin può reimpostarla dalla pagina **Utenti**. In alternativa, dalla cartella di installazione:
+Un altro super admin può reimpostarla da **Impostazioni › Utenti**. In alternativa, dalla cartella di installazione:
 
 ```bash
 docker compose exec iot-solar python -m modules.md_auth.reset_admin NUOVA_PASSWORD

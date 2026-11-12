@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================
-# Installer Docker per IoT-Solar (Debian, Ubuntu, Raspberry Pi OS)
+# Installer Docker per KINETRA Energia (Debian, Ubuntu, Raspberry Pi OS)
 #
 # Uso:   sudo ./installer-docker.sh [-y] [--build]
 #   -y        modalita' non interattiva
@@ -84,7 +84,7 @@ fi
 # --- 4. Firewall ----------------------------------------------
 if command -v ufw &>/dev/null && ufw status | grep -q "Status: active"; then
     print_info "Apertura della porta 8080 nel firewall..."
-    ufw allow 8080/tcp comment 'IoT-Solar'
+    ufw allow 8080/tcp comment 'KINETRA Energia'
 fi
 
 # --- 5. Immagine e avvio --------------------------------------
@@ -124,7 +124,7 @@ VERSION="$(curl -fsS http://127.0.0.1:8080/api/version | sed -E 's/.*"version":"
 
 IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
 echo "========================================"
-echo "IoT-Solar $VERSION installato e avviato"
+echo "KINETRA Energia $VERSION installato e avviato"
 echo "========================================"
 echo "Dashboard:  http://${IP:-<ip-macchina>}:8080/"
 if [ "$FIRST_INSTALL" = true ]; then
