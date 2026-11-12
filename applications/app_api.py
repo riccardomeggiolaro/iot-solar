@@ -66,7 +66,8 @@ def create_app(runtime):
 	auth = runtime.auth
 
 	# ---- autenticazione ------------------------------------------------
-	def current_user(request: Request):
+	# Dipendenze asincrone: girano nel ciclo principale invece che in un pool di thread
+	async def current_user(request: Request):
 		header = request.headers.get("authorization", "")
 		token = header[7:] if header.lower().startswith("bearer ") else None
 		if not token:
@@ -77,7 +78,7 @@ def create_app(runtime):
 			raise HTTPException(401, str(e))
 
 	def require(level):
-		def dep(user=Depends(current_user)):
+		async def dep(user=Depends(current_user)):
 			if user["must_change_password"]:
 				raise HTTPException(403, "Devi cambiare la password prima di continuare")
 			if user["level"] < level:

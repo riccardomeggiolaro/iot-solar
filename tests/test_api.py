@@ -139,3 +139,37 @@ def test_reset_admin_command(tmp_path, monkeypatch):
 	db = Database(str(tmp_path / "iot-solar.db"))
 	user = db.get_user(username="admin")
 	assert check_password("ripristino1", user["password_hash"]) and user["must_change_password"] == 1
+
+
+def test_database_is_safe_with_concurrent_threads(tmp_path):
+	"""FastAPI esegue le dipendenze sincrone in thread separati: la stessa connessione
+	SQLite non deve dare 'bad parameter or other API misuse' con richieste simultanee."""
+	from concurrent.futures import ThreadPoolExecutor
+	from modules.md_database.database import Database
+	db = Database(str(tmp_path / "t.db"))
+	uid = db.create_user("admin", "x", 4)
+	for i in range(50):
+		db.insert_reading("INV-1", {"ac_power_w": 1000, "energy_wh": i}, ts=1000 + i)
+
+	def work(_):
+		for _ in range(200):
+			assert db.get_user(user_id=uid)["username"] == "admin"
+			db.energy_stats(0)
+			db.active_alarms()
+
+	with ThreadPoolExecutor(max_workers=8) as pool:
+		list(pool.map(work, range(8)))
+
+
+def test_concurrent_api_requests(env):
+	from concurrent.futures import ThreadPoolExecutor
+	_, client, _ = env
+	h = admin_headers(client)
+
+	def call(i):
+		path = ("/api/plant", "/api/auth/me", "/api/alarms", "/api/devices/INV-1/history")[i % 4]
+		return client.get(path, headers=h).status_code
+
+	with ThreadPoolExecutor(max_workers=8) as pool:
+		codes = list(pool.map(call, range(200)))
+	assert set(codes) == {200}

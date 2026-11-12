@@ -1,5 +1,7 @@
 """Storico misure e allarmi su SQLite."""
+import functools
 import sqlite3
+import threading
 import time
 from pathlib import Path
 
@@ -42,10 +44,25 @@ READING_FIELDS = ("ac_power_w", "dc_power_w", "dc_voltage_v", "dc_current_a", "e
 				  "temperature_c", "status", "poa_wm2", "expected_w")
 
 
+def _locked(method):
+	@functools.wraps(method)
+	def wrapper(self, *args, **kwargs):
+		with self._lock:
+			return method(self, *args, **kwargs)
+	return wrapper
+
+
 class Database:
+	"""
+	Una sola connessione SQLite condivisa. Le richieste web possono arrivare da più thread
+	(FastAPI esegue le funzioni sincrone in un pool di thread), quindi ogni operazione è
+	protetta da un lock: una connessione SQLite non va usata da due thread nello stesso momento.
+	"""
+
 	def __init__(self, path):
 		if path != ":memory:":
 			Path(path).parent.mkdir(parents=True, exist_ok=True)
+		self._lock = threading.RLock()
 		self.conn = sqlite3.connect(path, check_same_thread=False)
 		self.conn.row_factory = sqlite3.Row
 		self.conn.executescript(SCHEMA)
@@ -174,3 +191,9 @@ class Database:
 	def delete_user(self, user_id):
 		self.conn.execute("DELETE FROM users WHERE id = ?", (user_id,))
 		self.conn.commit()
+
+
+# tutte le operazioni pubbliche passano dal lock
+for _name, _fn in list(vars(Database).items()):
+	if callable(_fn) and not _name.startswith("_"):
+		setattr(Database, _name, _locked(_fn))
