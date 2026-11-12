@@ -20,38 +20,41 @@ stima **quanti euro si stanno perdendo**, così il manutentore sa subito dove in
   calo uniforme di tutto l'impianto (sporco generalizzato o sensore da pulire).
 - **Perdita in €** per ogni allarme e per la giornata.
 - **Dashboard web** che funziona anche senza internet, e **API REST**.
+- **Utenti con livelli** (sola lettura, utente, amministratore, super admin) come iot-weight.
+- **Configurazione dal web**: impianto, inverter (con pulsante *Prova connessione*), soglie degli
+  allarmi. Le modifiche si applicano senza riavviare.
+- **Report PDF mensile** per il cliente: energia prodotta e attesa, rendimento, euro persi, allarmi.
+- **Installer Docker** per Linux (anche Raspberry Pi) e Windows, con aggiornamento a un comando.
 - **Simulatore** integrato di un impianto completo, con iniezione di guasti, per sviluppo e demo.
 
-## Avvio rapido (simulatore)
+## Installazione presso il cliente
+
+Con gli installer Docker per Linux e Windows: vedi **[docs/INSTALLAZIONE.md](docs/INSTALLAZIONE.md)**.
+
+## Avvio per sviluppo
 
 ```bash
 pip install -r requirements.txt
 python main.py
 ```
 
-Apri <http://localhost:8080>. Senza `config.json` viene usato `config.example.json`, che avvia un
-impianto simulato da 180 kWp (4 inverter e un piranometro). Dal riquadro **Simulatore** in fondo alla
-dashboard puoi spegnere stringhe, sporcare moduli, mandare un inverter in FAULT o scollegarlo, e
-vedere gli allarmi comparire.
+Apri <http://localhost:8080> e accedi con `admin` / `admin`: al primo accesso viene chiesto di cambiare la password.
+Al primo avvio viene creato `config.json` da `config.example.json`, con un impianto **simulato** da 180 kWp
+(4 inverter e un piranometro). Dal riquadro **Simulatore** in fondo alla dashboard puoi staccare stringhe,
+sporcare moduli, mandare un inverter in FAULT o scollegarlo, e vedere comparire gli allarmi.
 
-Per una demo di un'intera giornata in pochi minuti, imposta in config `"simulator": {"speed": 120, "start_hour": 6}`.
+Per vedere un'intera giornata in pochi minuti: Configurazione → Simulatore → velocità 120, ora di partenza 6.
 
-## Su un impianto reale
+Con Docker partendo dal codice sorgente: `docker compose up -d --build`.
 
-1. `cp config.example.json config.json`
-2. Imposta `"simulator": {"enabled": false}`.
-3. In `devices` inserisci IP, porta (di solito 502), `unit_id` e kWp di ogni inverter. Abilita Modbus TCP
-   / SunSpec dal menu dell'inverter (su SMA: "Modbus" attivo; su Fronius: "Data export via Modbus" con
-   "float" o "int+SF"; su SolarEdge: "Modbus TCP" dal SetApp).
-4. Se c'è un piranometro SunSpec, aggiungilo con `"type": "irradiance"`.
+## Rilascio di una versione
 
-## Docker
+1. Aggiorna il numero nel file `VERSION`.
+2. Crea e pubblica il tag: `git tag v0.2.0 && git push origin v0.2.0`.
 
-```bash
-docker compose up -d --build
-```
-
-La configurazione va in `./config/config.json`, lo storico in `./data`.
+La GitHub Action esegue i test, costruisce l'immagine per amd64 e arm64, la pubblica **privata** su
+`ghcr.io/riccardomeggiolaro/iot-solar` e crea una release con `iot-solar-docker.zip`, il pacchetto
+di installazione senza codice sorgente. Ogni push su `main` aggiorna l'immagine `latest`.
 
 ## Test
 
@@ -62,5 +65,6 @@ pytest -q
 
 ## Documentazione
 
+- [docs/INSTALLAZIONE.md](docs/INSTALLAZIONE.md): installazione, primo accesso, aggiornamento, backup.
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): architettura, algoritmi di analisi, roadmap.
 - API: <http://localhost:8080/docs> (Swagger generato da FastAPI).

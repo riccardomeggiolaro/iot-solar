@@ -68,7 +68,7 @@ class Monitor:
 	def snapshot(self):
 		"""Stato corrente dell'impianto per la dashboard."""
 		price = self.config["plant"].get("energy_price_eur_kwh", 0.2)
-		since = self.start_of_day()
+		stats = self.db.energy_stats(self.start_of_day(), devices=[d.name for d in self.devices if d.type == "inverter"])
 		devices, total_w, total_exp, energy_today, lost_today = [], 0.0, 0.0, 0.0, 0.0
 		for d in self.devices:
 			r = self.last["readings"].get(d.name)
@@ -76,8 +76,8 @@ class Monitor:
 					"info": d.info, "values": r}
 			if d.type == "inverter":
 				exp = self.last["expected"].get(d.name)
-				e_today = self.db.energy_since(d.name, since)
-				l_today = self.db.lost_energy_since(d.name, since)
+				st = stats.get(d.name, {})
+				e_today, l_today = st.get("energy_wh", 0.0), st.get("lost_wh", 0.0)
 				item.update(expected_w=exp, energy_today_wh=e_today, lost_today_wh=l_today)
 				total_w += (r or {}).get("ac_power_w") or 0
 				total_exp += exp or 0

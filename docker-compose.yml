@@ -1,12 +1,26 @@
+# IoT-Solar - avvio con:  docker compose pull && docker compose up -d
+#
+# network_mode host -> la dashboard risponde sulla porta di config.json (default 8080)
+#                      e gli inverter in rete locale si raggiungono come da installazione nativa
 services:
   iot-solar:
-    build: .
-    image: iot-solar:latest
+    build:
+      context: .
+    # Immagine pubblicata dalla GitHub Action (registry privato: serve "docker login ghcr.io").
+    # Con il codice sorgente si puo' anche costruire in locale: docker compose up -d --build
+    image: ${IOT_SOLAR_IMAGE:-ghcr.io/riccardomeggiolaro/iot-solar}:${IOT_SOLAR_TAG:-latest}
+    container_name: iot-solar
     restart: unless-stopped
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./data:/opt/iot-solar/data
-      - ./config:/etc/iot-solar
+    network_mode: host
     environment:
-      - TZ=Europe/Rome
+      TZ: ${TZ:-Europe/Rome}
+      # password iniziale dell'utente "admin": usata solo al primo avvio
+      IOT_SOLAR_ADMIN_PASSWORD: ${IOT_SOLAR_ADMIN_PASSWORD:-}
+    volumes:
+      - ${IOT_SOLAR_CONFIG_DIR:-./docker-data/config}:/etc/iot-solar
+      - ${IOT_SOLAR_DATA_DIR:-./docker-data/data}:/var/opt/iot-solar
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"

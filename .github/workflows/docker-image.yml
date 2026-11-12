@@ -1,0 +1,96 @@
+# Costruisce l'immagine Docker di IoT-Solar e la pubblica (privata) su GitHub Container Registry.
+#
+# - push su main       -> ghcr.io/<owner>/iot-solar:latest (+ :sha-xxxxxxx)
+# - tag vX.Y.Z         -> ghcr.io/<owner>/iot-solar:X.Y.Z, :X.Y, :latest
+#                         + release GitHub con lo zip di installazione (iot-solar-docker.zip)
+# - avvio manuale      -> scheda Actions > "Docker image" > Run workflow
+#
+# Piattaforme: linux/amd64 (PC, mini PC) e linux/arm64 (Raspberry Pi 4/5).
+name: Docker image
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write   # creazione della release sui tag
+  packages: write   # push su ghcr.io
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-dev.txt
+      - run: pytest -q
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Versione
+        id: version
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=$(cat VERSION)-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') }}
+            type=sha
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          build-args: VERSION=${{ steps.version.outputs.version }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Pacchetto di installazione
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          mkdir -p dist/iot-solar-docker
+          cp docker-compose.yml docker-compose.windows.yml .env.example \
+             installer-docker.sh installer-docker.ps1 docs/INSTALLAZIONE.md dist/iot-solar-docker/
+          sed -i "s/^IOT_SOLAR_TAG=.*/IOT_SOLAR_TAG=${GITHUB_REF_NAME#v}/" dist/iot-solar-docker/.env.example
+          # senza il codice sorgente il compose non deve tentare la build
+          sed -i '/^    build:/,/^      context: \./d' dist/iot-solar-docker/docker-compose.yml
+          cd dist && zip -r iot-solar-docker.zip iot-solar-docker
+
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/iot-solar-docker.zip
+          generate_release_notes: true

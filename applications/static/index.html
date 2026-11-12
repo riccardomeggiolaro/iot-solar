@@ -4,210 +4,202 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>IoT-Solar</title>
-<style>
-:root {
-	--bg: #f4f6f8; --card: #fff; --text: #1d2733; --muted: #66727f; --line: #e2e7ec;
-	--accent: #e8a317; --ok: #2e9d5b; --warn: #d98a00; --crit: #d23c3c; --exp: #8a96a3;
-}
-@media (prefers-color-scheme: dark) {
-	:root { --bg: #12161b; --card: #1b2128; --text: #e6ebf0; --muted: #94a0ad; --line: #2b333c; --exp: #7d8996; }
-}
-* { box-sizing: border-box; }
-body { margin: 0; font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); }
-header { display: flex; align-items: center; gap: 12px; padding: 14px 20px; background: var(--card); border-bottom: 1px solid var(--line); }
-header h1 { font-size: 18px; margin: 0; }
-header .sun { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent); }
-header .ts { margin-left: auto; color: var(--muted); font-size: 12px; }
-main { max-width: 1200px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }
-.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
-.card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
-.kpi .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
-.kpi .value { font-size: 26px; font-weight: 650; margin-top: 4px; font-variant-numeric: tabular-nums; }
-.kpi .sub { color: var(--muted); font-size: 12px; }
-.kpi.loss .value { color: var(--crit); }
-h2 { font-size: 15px; margin: 0 0 10px; }
-.grid2 { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; }
-@media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; } }
-table { width: 100%; border-collapse: collapse; }
-th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
-th { color: var(--muted); font-weight: 500; font-size: 12px; }
-tr.dev { cursor: pointer; }
-tr.dev:hover, tr.dev.sel { background: color-mix(in srgb, var(--accent) 10%, transparent); }
-.bar { position: relative; height: 8px; background: var(--line); border-radius: 4px; min-width: 80px; }
-.bar i { position: absolute; inset: 0 auto 0 0; background: var(--ok); border-radius: 4px; }
-.bar b { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--text); }
-.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
-.alarm { border-left: 4px solid var(--warn); padding: 8px 10px; margin-bottom: 8px; background: color-mix(in srgb, var(--warn) 7%, transparent); border-radius: 4px; }
-.alarm.critical { border-color: var(--crit); background: color-mix(in srgb, var(--crit) 7%, transparent); }
-.alarm .t { font-weight: 600; }
-.alarm .h { color: var(--muted); font-size: 12px; margin-top: 2px; }
-.alarm .m { display: flex; gap: 10px; align-items: center; font-size: 12px; margin-top: 4px; color: var(--muted); }
-button { font: inherit; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: var(--text); cursor: pointer; }
-button:hover { border-color: var(--accent); }
-.empty { color: var(--muted); }
-svg text { fill: var(--muted); font-size: 11px; }
-.legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); }
-.legend span::before { content: ""; display: inline-block; width: 14px; height: 3px; margin-right: 6px; vertical-align: middle; background: var(--c); }
-#sim { display: none; }
-#sim .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 8px; }
-#sim label { font-size: 12px; color: var(--muted); }
-#sim select, #sim input[type=number] { font: inherit; padding: 3px 6px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: var(--text); width: 80px; }
-#sim select { width: auto; }
-</style>
+<link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-<header><div class="sun"></div><h1 id="plant">IoT-Solar</h1><span class="ts" id="ts"></span></header>
-<main>
-	<section class="kpis">
-		<div class="card kpi"><div class="label">Potenza ora</div><div class="value" id="k-power">–</div><div class="sub" id="k-power-sub"></div></div>
-		<div class="card kpi"><div class="label">Energia oggi</div><div class="value" id="k-energy">–</div><div class="sub" id="k-energy-sub"></div></div>
-		<div class="card kpi loss"><div class="label">Perdita stimata oggi</div><div class="value" id="k-loss">–</div><div class="sub" id="k-loss-sub"></div></div>
-		<div class="card kpi"><div class="label">Irraggiamento</div><div class="value" id="k-irr">–</div><div class="sub">sul piano dei moduli</div></div>
-	</section>
 
-	<section class="grid2">
-		<div class="card">
-			<h2>Inverter</h2>
+<!-- ===== Login ===== -->
+<section id="view-login" class="login" hidden>
+	<form class="card" id="login-form">
+		<div class="brand"><div class="sun"></div>IoT-Solar</div>
+		<label class="field">Nome utente<input name="username" autocomplete="username" required autofocus></label>
+		<label class="field">Password<input name="password" type="password" autocomplete="current-password" required></label>
+		<div id="login-error" class="notice err" hidden></div>
+		<button class="primary" type="submit">Accedi</button>
+	</form>
+</section>
+
+<!-- ===== Cambio password ===== -->
+<section id="view-password" class="login" hidden>
+	<form class="card" id="password-form">
+		<div class="brand"><div class="sun"></div>Nuova password</div>
+		<div class="notice info" id="password-forced">Per sicurezza scegli una nuova password prima di continuare.</div>
+		<label class="field">Password attuale<input name="old_password" type="password" autocomplete="current-password" required></label>
+		<label class="field">Nuova password (almeno 6 caratteri)<input name="new_password" type="password" autocomplete="new-password" minlength="6" required></label>
+		<label class="field">Ripeti la nuova password<input name="repeat" type="password" autocomplete="new-password" minlength="6" required></label>
+		<div id="password-error" class="notice err" hidden></div>
+		<div class="row" style="justify-content:flex-end"><button type="button" id="password-cancel">Annulla</button><button class="primary" type="submit">Salva password</button></div>
+	</form>
+</section>
+
+<!-- ===== Applicazione ===== -->
+<div id="app" hidden>
+	<header>
+		<div class="sun"></div>
+		<h1 id="plant-name">IoT-Solar</h1>
+		<nav id="nav">
+			<a href="#/dashboard" data-view="dashboard">Impianto</a>
+			<a href="#/report" data-view="report">Report</a>
+			<a href="#/config" data-view="config" data-level="3">Configurazione</a>
+			<a href="#/users" data-view="users" data-level="3">Utenti</a>
+		</nav>
+		<div class="userbox">
+			<span id="user-label"></span>
+			<button id="btn-password" title="Cambia password">Password</button>
+			<button id="btn-logout">Esci</button>
+		</div>
+	</header>
+
+	<!-- Dashboard -->
+	<main id="view-dashboard" hidden>
+		<div id="sim-banner" class="notice info" hidden>Stai vedendo un <b>impianto simulato</b>. Per collegare gli inverter reali vai su Configurazione e disattiva il simulatore.</div>
+		<section class="kpis">
+			<div class="card kpi"><div class="label">Potenza ora</div><div class="value" id="k-power">–</div><div class="sub" id="k-power-sub"></div></div>
+			<div class="card kpi"><div class="label">Energia oggi</div><div class="value" id="k-energy">–</div><div class="sub" id="k-energy-sub"></div></div>
+			<div class="card kpi loss"><div class="label">Perdita stimata oggi</div><div class="value" id="k-loss">–</div><div class="sub" id="k-loss-sub"></div></div>
+			<div class="card kpi"><div class="label">Irraggiamento</div><div class="value" id="k-irr">–</div><div class="sub">sul piano dei moduli</div></div>
+		</section>
+		<section class="grid2">
+			<div class="card scroll">
+				<h2>Inverter</h2>
+				<table>
+					<thead><tr><th>Nome</th><th>Stato</th><th>Potenza</th><th>Reale / atteso</th><th>Oggi</th><th>Temp.</th></tr></thead>
+					<tbody id="devices"></tbody>
+				</table>
+			</div>
+			<div class="card">
+				<h2>Allarmi attivi</h2>
+				<div id="alarms"></div>
+			</div>
+		</section>
+		<section class="card">
+			<div class="row" style="margin-bottom:8px">
+				<h2 style="margin:0" id="chart-title">Storico</h2>
+				<div class="legend"><span style="--c:var(--accent)">Reale</span><span style="--c:var(--exp)">Atteso</span></div>
+			</div>
+			<svg id="chart" viewBox="0 0 1000 260" width="100%" preserveAspectRatio="none" style="height:260px"></svg>
+		</section>
+		<section class="card" id="sim" hidden>
+			<h2>Simulatore – inietta un guasto</h2>
+			<div class="row">
+				<select id="sim-dev"></select>
+				<label class="small muted">Sporco <input type="number" id="sim-soiling" min="0" max="1" step="0.05" value="0" style="width:80px"></label>
+				<label class="small muted">Stringhe perse <input type="number" id="sim-string" min="0" max="1" step="0.1" value="0" style="width:80px"></label>
+				<label class="small muted"><input type="checkbox" id="sim-fault"> FAULT</label>
+				<label class="small muted"><input type="checkbox" id="sim-offline"> Offline</label>
+				<button id="sim-apply" data-level="3">Applica</button>
+			</div>
+			<div class="small muted" id="sim-state" style="margin-top:8px"></div>
+		</section>
+	</main>
+
+	<!-- Report -->
+	<main id="view-report" hidden>
+		<section class="card">
+			<div class="row">
+				<h2 style="margin:0">Report mensile</h2>
+				<input type="month" id="report-month">
+				<button class="primary" id="report-pdf">Scarica PDF</button>
+			</div>
+		</section>
+		<section class="kpis" id="report-kpis"></section>
+		<section class="card">
+			<div class="row" style="margin-bottom:8px">
+				<h2 style="margin:0">Produzione giornaliera</h2>
+				<div class="legend"><span style="--c:var(--accent)">Prodotta (kWh)</span><span style="--c:var(--exp)">Attesa (kWh)</span></div>
+			</div>
+			<svg id="report-chart" viewBox="0 0 1000 220" width="100%" preserveAspectRatio="none" style="height:220px"></svg>
+		</section>
+		<section class="card scroll">
+			<h2>Dettaglio inverter</h2>
 			<table>
-				<thead><tr><th>Nome</th><th>Stato</th><th>Potenza</th><th>Reale / atteso</th><th>Oggi</th><th>Temp.</th></tr></thead>
-				<tbody id="devices"></tbody>
+				<thead><tr><th>Inverter</th><th>kWp</th><th>Prodotta</th><th>kWh/kWp</th><th>Rendimento</th><th>Persa</th><th>Allarmi</th></tr></thead>
+				<tbody id="report-inverters"></tbody>
 			</table>
-		</div>
-		<div class="card">
-			<h2>Allarmi attivi</h2>
-			<div id="alarms"></div>
-		</div>
-	</section>
+		</section>
+	</main>
 
-	<section class="card">
-		<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-			<h2 style="margin:0" id="chart-title">Storico</h2>
-			<div class="legend"><span style="--c:var(--accent)">Reale</span><span style="--c:var(--exp)">Atteso</span></div>
-		</div>
-		<svg id="chart" viewBox="0 0 1000 260" width="100%" preserveAspectRatio="none" style="height:260px"></svg>
-	</section>
+	<!-- Configurazione -->
+	<main id="view-config" hidden>
+		<div id="config-msg" class="notice" hidden></div>
+		<section class="card">
+			<h2>Impianto</h2>
+			<div class="form">
+				<label class="field">Nome impianto<input data-cfg="plant.name"></label>
+				<label class="field">Cliente (per il report)<input data-cfg="plant.owner"></label>
+				<label class="field">Indirizzo<input data-cfg="plant.address"></label>
+				<label class="field">Latitudine<input type="number" step="0.0001" data-cfg="plant.latitude"></label>
+				<label class="field">Longitudine<input type="number" step="0.0001" data-cfg="plant.longitude"></label>
+				<label class="field">Prezzo energia (€/kWh)<input type="number" step="0.001" data-cfg="plant.energy_price_eur_kwh"></label>
+				<label class="field">Fuso orario<input data-cfg="plant.timezone"></label>
+			</div>
+		</section>
+		<section class="card scroll">
+			<div class="row" style="justify-content:space-between">
+				<h2 style="margin:0">Dispositivi</h2>
+				<div class="row"><button id="add-inverter">+ Inverter</button><button id="add-sensor">+ Sensore irraggiamento</button></div>
+			</div>
+			<p class="small muted">Sull'inverter va attivato Modbus TCP (SunSpec). La porta è di solito 502; l'unit id è l'indirizzo Modbus del dispositivo.</p>
+			<table>
+				<thead><tr><th>Nome</th><th>Tipo</th><th>Indirizzo IP</th><th>Porta</th><th>Unit id</th><th>kWp</th><th></th></tr></thead>
+				<tbody id="cfg-devices"></tbody>
+			</table>
+		</section>
+		<section class="card">
+			<h2>Allarmi e analisi</h2>
+			<div class="form">
+				<label class="field">Scostamento dall'atteso (0,20 = 20%)<input type="number" step="0.01" data-cfg="analysis.expected_threshold"></label>
+				<label class="field">Scostamento dagli altri inverter<input type="number" step="0.01" data-cfg="analysis.peer_threshold"></label>
+				<label class="field">Irraggiamento minimo per valutare (W/m²)<input type="number" data-cfg="analysis.min_irradiance"></label>
+				<label class="field">Rapporto atteso impianto sano (derate)<input type="number" step="0.01" data-cfg="analysis.derate"></label>
+				<label class="field">Sovratemperatura inverter (°C)<input type="number" data-cfg="analysis.overtemp_c"></label>
+				<label class="field">Letture consecutive prima dell'allarme<input type="number" data-cfg="analysis.persist_cycles"></label>
+				<label class="field">Letture fallite prima di "offline"<input type="number" data-cfg="analysis.offline_after_failures"></label>
+				<label class="field">Intervallo di lettura (s)<input type="number" data-cfg="polling.interval_s"></label>
+				<label class="field">Webhook notifiche (URL)<input data-cfg="alarms.webhook_url" placeholder="https://..."></label>
+				<label class="field">Conservazione storico (giorni)<input type="number" data-cfg="database.retention_days"></label>
+			</div>
+		</section>
+		<section class="card">
+			<h2>Simulatore</h2>
+			<div class="form">
+				<label class="field">Attivo<select data-cfg="simulator.enabled" data-type="bool"><option value="true">Sì</option><option value="false">No</option></select></label>
+				<label class="field">Velocità del tempo (1 = reale)<input type="number" step="1" data-cfg="simulator.speed"></label>
+				<label class="field">Ora di partenza (vuoto = adesso)<input type="number" step="0.5" data-cfg="simulator.start_hour" data-type="optnum"></label>
+				<label class="field">Porta Modbus<input type="number" data-cfg="simulator.port"></label>
+			</div>
+			<p class="small muted">Con il simulatore attivo i dispositivi devono puntare a 127.0.0.1 e alla porta del simulatore.</p>
+		</section>
+		<div class="actions"><button id="config-reload">Annulla modifiche</button><button class="primary" id="config-save">Salva e applica</button></div>
+	</main>
 
-	<section class="card" id="sim">
-		<h2>Simulatore – inietta un guasto</h2>
-		<div class="row">
-			<select id="sim-dev"></select>
-			<label>Sporco <input type="number" id="sim-soiling" min="0" max="1" step="0.05" value="0"></label>
-			<label>Stringhe perse <input type="number" id="sim-string" min="0" max="1" step="0.1" value="0"></label>
-			<label><input type="checkbox" id="sim-fault"> FAULT</label>
-			<label><input type="checkbox" id="sim-offline"> Offline</label>
-			<button id="sim-apply">Applica</button>
-		</div>
-		<div class="sub" id="sim-state" style="color:var(--muted);font-size:12px"></div>
-	</section>
-</main>
+	<!-- Utenti -->
+	<main id="view-users" hidden>
+		<div id="users-msg" class="notice" hidden></div>
+		<section class="card scroll">
+			<h2>Utenti</h2>
+			<table>
+				<thead><tr><th>Utente</th><th>Descrizione</th><th>Livello</th><th></th></tr></thead>
+				<tbody id="users-list"></tbody>
+			</table>
+		</section>
+		<section class="card">
+			<h2>Nuovo utente</h2>
+			<form class="form" id="user-form">
+				<label class="field">Nome utente<input name="username" required></label>
+				<label class="field">Descrizione<input name="description"></label>
+				<label class="field">Livello<select name="level" id="user-level"></select></label>
+				<label class="field">Password iniziale<input name="password" type="password" minlength="6" required></label>
+				<div class="row" style="align-items:end"><button class="primary" type="submit">Crea utente</button></div>
+			</form>
+			<p class="small muted">Al primo accesso il nuovo utente dovrà cambiare la password.<br>
+				Sola lettura: vede impianto e report · Utente: prende in carico gli allarmi · Amministratore: configurazione e utenti · Super admin: anche gli amministratori.</p>
+		</section>
+	</main>
 
-<script>
-const $ = (id) => document.getElementById(id);
-const kw = (w) => w == null ? "–" : (w / 1000).toLocaleString("it-IT", { maximumFractionDigits: 1 }) + " kW";
-const kwh = (wh) => wh == null ? "–" : wh < 1000 ? Math.round(wh) + " Wh" : (wh / 1000).toLocaleString("it-IT", { maximumFractionDigits: 1 }) + " kWh";
-const eur = (v) => v.toLocaleString("it-IT", { style: "currency", currency: "EUR" });
-const statusColor = { MPPT: "var(--ok)", THROTTLED: "var(--ok)", SLEEPING: "var(--muted)", FAULT: "var(--crit)" };
-let selected = null, simLoaded = false, simDevices = {};
+	<footer id="footer"></footer>
+</div>
 
-async function refresh() {
-	let p;
-	try { p = await (await fetch("/api/plant")).json(); } catch { return; }
-	$("plant").textContent = p.plant;
-	$("ts").textContent = p.ts ? "Aggiornato " + new Date(p.ts * 1000).toLocaleTimeString("it-IT") : "";
-	$("k-power").textContent = kw(p.power_w);
-	$("k-power-sub").textContent = p.expected_w ? `atteso ${kw(p.expected_w)} · ${p.kwp} kWp` : `${p.kwp} kWp installati`;
-	$("k-energy").textContent = kwh(p.energy_today_wh);
-	$("k-energy-sub").textContent = `ricavo ${eur(p.energy_today_wh / 1000 * p.energy_price_eur_kwh)}`;
-	$("k-loss").textContent = eur(p.lost_today_eur);
-	$("k-loss-sub").textContent = kwh(p.lost_today_wh) + " non prodotti";
-	$("k-irr").textContent = p.poa_wm2 == null ? "–" : Math.round(p.poa_wm2) + " W/m²";
-
-	const inv = p.devices.filter((d) => d.type === "inverter");
-	if (!selected && inv.length) selected = inv[0].name;
-	$("devices").innerHTML = inv.map((d) => {
-		const v = d.values || {};
-		const st = d.online ? (v.status_text || "?") : "OFFLINE";
-		const max = Math.max(v.ac_power_w || 0, d.expected_w || 0, 1);
-		const ratio = d.expected_w ? (v.ac_power_w || 0) / d.expected_w : null;
-		const barColor = ratio == null ? "var(--ok)" : ratio < 0.8 ? "var(--crit)" : ratio < 0.9 ? "var(--warn)" : "var(--ok)";
-		return `<tr class="dev ${d.name === selected ? "sel" : ""}" data-name="${d.name}">
-			<td><b>${d.name}</b><div style="color:var(--muted);font-size:11px">${d.kwp} kWp</div></td>
-			<td><span class="dot" style="background:${d.online ? statusColor[st] || "var(--warn)" : "var(--crit)"}"></span>${st}</td>
-			<td>${d.online ? kw(v.ac_power_w) : "–"}</td>
-			<td><div class="bar"><i style="width:${(v.ac_power_w || 0) / max * 100}%;background:${barColor}"></i>${d.expected_w ? `<b style="left:${d.expected_w / max * 100}%"></b>` : ""}</div>
-				<div style="font-size:11px;color:var(--muted)">${ratio == null ? "" : Math.round(ratio * 100) + "%"}</div></td>
-			<td>${kwh(d.energy_today_wh)}</td>
-			<td>${v.temperature_c == null || !d.online ? "–" : Math.round(v.temperature_c) + " °C"}</td></tr>`;
-	}).join("");
-	document.querySelectorAll("tr.dev").forEach((tr) => tr.onclick = () => { selected = tr.dataset.name; refresh(); });
-
-	$("alarms").innerHTML = p.active_alarms.length ? p.active_alarms.map((a) => `
-		<div class="alarm ${a.severity}">
-			<div class="t">${a.message.startsWith(a.device) ? "" : (a.device === "IMPIANTO" ? "Impianto" : a.device) + " · "}${a.message}</div>
-			<div class="h">${a.hint || ""}</div>
-			<div class="m"><span>dal ${new Date(a.started_at * 1000).toLocaleString("it-IT")}</span>
-			${a.lost_wh > 0 ? `<span>persi ${kwh(a.lost_wh)} (${eur(a.lost_wh / 1000 * p.energy_price_eur_kwh)})</span>` : ""}
-			${a.acknowledged ? "<span>✓ preso in carico</span>" : `<button onclick="ack(${a.id})">Prendi in carico</button>`}</div>
-		</div>`).join("") : '<div class="empty">Nessun allarme: impianto regolare.</div>';
-
-	if (selected) drawChart(selected);
-	if (!simLoaded) loadSim();
-}
-
-async function ack(id) { await fetch(`/api/alarms/${id}/ack`, { method: "POST" }); refresh(); }
-
-async function drawChart(name) {
-	const rows = await (await fetch(`/api/devices/${encodeURIComponent(name)}/history?hours=24`)).json();
-	$("chart-title").textContent = `Storico ${name} (24 h)`;
-	const svg = $("chart"), W = 1000, H = 260, pad = { l: 50, r: 10, t: 10, b: 24 };
-	if (rows.length < 2) { svg.innerHTML = `<text x="${W / 2}" y="${H / 2}" text-anchor="middle">Dati insufficienti</text>`; return; }
-	const t0 = rows[0].ts, t1 = rows[rows.length - 1].ts;
-	const ymax = Math.max(...rows.map((r) => Math.max(r.ac_power_w || 0, r.expected_w || 0)), 1) * 1.1;
-	const x = (t) => pad.l + (t - t0) / Math.max(t1 - t0, 1) * (W - pad.l - pad.r);
-	const y = (v) => H - pad.b - (v / ymax) * (H - pad.t - pad.b);
-	const path = (key) => rows.filter((r) => r[key] != null).map((r, i) => `${i ? "L" : "M"}${x(r.ts).toFixed(1)},${y(r[key]).toFixed(1)}`).join("");
-	let grid = "";
-	for (let i = 0; i <= 4; i++) {
-		const v = ymax / 4 * i;
-		grid += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${pad.l - 6}" y="${y(v) + 4}" text-anchor="end">${(v / 1000).toFixed(0)} kW</text>`;
-	}
-	for (let i = 0; i <= 4; i++) {
-		const t = t0 + (t1 - t0) / 4 * i;
-		grid += `<text x="${x(t)}" y="${H - 6}" text-anchor="middle">${new Date(t * 1000).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}</text>`;
-	}
-	svg.innerHTML = grid +
-		`<path d="${path("expected_w")}" fill="none" stroke="var(--exp)" stroke-width="2" stroke-dasharray="6 4" vector-effect="non-scaling-stroke"/>` +
-		`<path d="${path("ac_power_w")}" fill="none" stroke="var(--accent)" stroke-width="2.5" vector-effect="non-scaling-stroke"/>`;
-}
-
-async function loadSim() {
-	const r = await fetch("/api/simulator");
-	simLoaded = true;
-	if (!r.ok) return;
-	$("sim").style.display = "block";
-	const s = await r.json();
-	simDevices = s.devices;
-	$("sim-dev").innerHTML = Object.keys(s.devices).map((n) => `<option>${n}</option>`).join("");
-	const fill = () => {
-		const d = s.devices[$("sim-dev").value];
-		$("sim-soiling").value = d.soiling ?? 0; $("sim-string").value = d.string_loss ?? 0;
-		$("sim-fault").checked = !!d.fault; $("sim-offline").checked = !!d.offline;
-	};
-	$("sim-dev").onchange = fill; fill();
-	$("sim-state").textContent = `Ora simulata ${s.state.sim_time} · sole ${s.state.sun_elevation}° · nuvolosità ${s.state.cloud_factor}`;
-}
-
-$("sim-apply").onclick = async () => {
-	const name = $("sim-dev").value;
-	const body = { offline: $("sim-offline").checked };
-	if (simDevices[name]?.type === "inverter") Object.assign(body, {
-		soiling: +$("sim-soiling").value, string_loss: +$("sim-string").value, fault: $("sim-fault").checked });
-	await fetch(`/api/simulator/${encodeURIComponent(name)}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
-	simLoaded = false; refresh();
-};
-
-refresh();
-setInterval(refresh, 5000);
-</script>
+<script src="/static/app.js"></script>
 </body>
 </html>

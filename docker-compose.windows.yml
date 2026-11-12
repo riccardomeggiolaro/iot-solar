@@ -1,0 +1,13 @@
+# Override per Docker Desktop su Windows.
+#
+# Docker Desktop non supporta in modo affidabile network_mode: host, quindi il
+# container usa la rete bridge pubblicando la porta web sul PC Windows.
+# Gli inverter in rete locale restano raggiungibili (connessioni in uscita).
+#
+# installer-docker.ps1 imposta COMPOSE_FILE nel file .env, quindi basta "docker compose up -d"
+services:
+  iot-solar:
+    network_mode: bridge
+    ports:
+      # la porta interna deve corrispondere ad api.port in config.json (default 8080)
+      - "${IOT_SOLAR_HTTP_PORT:-8080}:8080"
