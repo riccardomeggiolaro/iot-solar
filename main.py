@@ -1,44 +1,42 @@
 """
 IoT-Solar: monitoraggio impianti fotovoltaici.
 
-Avvia (nello stesso processo asyncio):
-  - il simulatore Modbus SunSpec, se abilitato in config;
-  - il ciclo di monitoraggio (lettura, storico, analisi, allarmi);
-  - l'API REST con la dashboard.
+Avvia nello stesso processo asyncio il simulatore (se abilitato), il ciclo di
+monitoraggio e l'API REST con la dashboard.
+
+Cartelle (variabili d'ambiente, usate da Docker):
+  IOT_SOLAR_CONFIG_DIR   contiene config.json (creato dall'esempio al primo avvio)
+  IOT_SOLAR_DATA_DIR     database, chiave dei token
+  IOT_SOLAR_ADMIN_PASSWORD  password iniziale dell'utente admin (solo al primo avvio)
 
 Uso:  python main.py [percorso/config.json]
 """
 import asyncio
-import json
 import logging
 import os
 import signal
 import sys
-from pathlib import Path
 
 import uvicorn
 
 from applications.app_api import create_app
-from modules.md_database.database import Database
-from modules.md_monitor.monitor import Monitor
-
-BASE = Path(__file__).parent
-
-
-def load_config(path=None):
-	path = Path(path or os.environ.get("IOT_SOLAR_CONFIG") or BASE / "config.json")
-	if not path.exists():
-		path = BASE / "config.example.json"
-	with open(path, encoding="utf-8") as f:
-		return json.load(f), path
+from modules.md_runtime import settings
+from modules.md_runtime.runtime import Runtime
 
 
 async def main(config_path=None):
-	config, path = load_config(config_path)
+	default_config, data_dir = settings.resolve_paths()
+	runtime = Runtime(config_path or default_config, data_dir)
+	config = runtime.config
 	logging.basicConfig(level=config.get("log_level", "INFO"),
 						format="%(asctime)s %(levelname)-7s %(name)-10s %(message)s")
 	logging.getLogger("pymodbus").setLevel(logging.CRITICAL)
-	logging.info("configurazione: %s", path)
+	logging.info("IoT-Solar %s – configurazione %s, dati %s", runtime.version, runtime.config_path, runtime.data_dir)
+
+	initial = runtime.auth.ensure_admin(os.environ.get("IOT_SOLAR_ADMIN_PASSWORD"))
+	if initial:
+		logging.warning("primo accesso: utente 'admin', password %s",
+						"quella impostata in IOT_SOLAR_ADMIN_PASSWORD" if os.environ.get("IOT_SOLAR_ADMIN_PASSWORD") else "'admin'")
 
 	stop = asyncio.Event()
 	loop = asyncio.get_running_loop()
@@ -48,31 +46,17 @@ async def main(config_path=None):
 		except NotImplementedError:
 			pass
 
-	db_path = config.get("database", {}).get("path", "data/iot-solar.db")
-	db = Database(db_path if os.path.isabs(db_path) else str(BASE / db_path))
-	tasks = []
-
-	simulator = None
-	if config.get("simulator", {}).get("enabled"):
-		from modules.md_simulator.simulator import PlantSimulator
-		simulator = PlantSimulator(config)
-		tasks.append(asyncio.create_task(simulator.run(stop)))
-		await asyncio.sleep(0.5)
-
-	monitor = Monitor(config, db)
-	tasks.append(asyncio.create_task(monitor.run(stop)))
-
-	api = config.get("api", {})
-	server = uvicorn.Server(uvicorn.Config(create_app(monitor, simulator), host=api.get("host", "0.0.0.0"),
-										   port=api.get("port", 8080), log_level="warning"))
+	await runtime.start()
+	api = config["api"]
+	server = uvicorn.Server(uvicorn.Config(create_app(runtime), host=api["host"], port=api["port"], log_level="warning"))
 	server.install_signal_handlers = lambda: None
-	tasks.append(asyncio.create_task(server.serve()))
-	logging.info("dashboard: http://%s:%s", api.get("host", "0.0.0.0"), api.get("port", 8080))
+	serve = asyncio.create_task(server.serve())
+	logging.info("dashboard: http://%s:%s", "localhost" if api["host"] == "0.0.0.0" else api["host"], api["port"])
 
 	await stop.wait()
 	server.should_exit = True
-	await asyncio.gather(*tasks, return_exceptions=True)
-	db.close()
+	await asyncio.gather(serve, return_exceptions=True)
+	await runtime.shutdown()
 
 
 if __name__ == "__main__":

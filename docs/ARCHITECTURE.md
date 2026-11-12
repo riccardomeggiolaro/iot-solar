@@ -31,6 +31,9 @@ event loop **asyncio**, senza thread: lettura Modbus, API e simulatore convivono
 | `md_alarms` | ciclo di vita degli allarmi, notifiche | – |
 | `md_database` | storico misure e allarmi | `md_database` |
 | `md_monitor` | orchestrazione del ciclo di lettura | `main.py` + thread |
+| `md_auth` | utenti, password bcrypt, token JWT, livelli | `utils_auth` + middleware |
+| `md_report` | report mensile PDF (reportlab) | `utils_report` (WeasyPrint) |
+| `md_runtime` | schema di config.json, applicazione delle modifiche senza riavvio | `lb_config` |
 | `app_api` | REST + dashboard | `app_api` |
 
 ## Acquisizione dati
@@ -64,6 +67,41 @@ stringa o MPPT fuori servizio, sotto il 35% sporco/ombra/degrado.
 **Energia persa**: integrale nel tempo di `max(atteso − reale, 0)`, salvato per ogni allarme e per
 giornata, e convertito in € con il prezzo dell'energia configurato.
 
+## Utenti e sicurezza
+
+- Password con bcrypt; sessioni con token JWT (HS256) firmati da una chiave casuale generata al primo
+  avvio in `secret.key` nella cartella dati. Durata configurabile (`api.token_hours`, default 30 giorni).
+- Livelli: 1 sola lettura, 2 utente (prende in carico gli allarmi), 3 amministratore (configurazione,
+  utenti di livello inferiore, simulatore), 4 super admin (anche gli amministratori).
+- Al primo avvio viene creato `admin` con la password di `IOT_SOLAR_ADMIN_PASSWORD`; gli installer la
+  generano casuale. Chi ha una password provvisoria deve cambiarla prima di usare le API.
+- Il token viaggia solo nell'header `Authorization`, mai nell'URL; il PDF si scarica con una richiesta autenticata.
+- Recupero dell'admin: `python -m modules.md_auth.reset_admin NUOVA_PASSWORD`.
+
+## Configurazione dal web
+
+`PUT /api/config` valida la configurazione con lo schema pydantic di `md_runtime/settings.py`
+(coordinate, kWp obbligatori per gli inverter, nomi e indirizzi Modbus non duplicati…), la salva in modo
+atomico su `config.json`, poi ferma e ricrea monitor e simulatore con i nuovi parametri. Storico, allarmi
+aperti e sessioni degli utenti restano. `POST /api/devices/test` prova un dispositivo prima di salvarlo.
+
+## Energia e rendimento
+
+- **Energia prodotta**: somma degli incrementi del contatore dell'inverter tra letture successive.
+  Gli incrementi negativi (contatore azzerato, inverter sostituito) e quelli impossibili per la potenza
+  misurata vengono scartati. Il contatore resta affidabile anche se il monitoraggio si ferma per qualche minuto.
+- **Rendimento**: energia reale / attesa calcolate *sugli stessi intervalli*. Viene mostrato solo
+  quando l'atteso è significativo (almeno 0,5 kWh/kWp).
+
+## Distribuzione
+
+- Immagine Docker unica per `linux/amd64` e `linux/arm64`, pubblicata privata su ghcr.io dalla GitHub
+  Action `docker-image.yml`: `latest` a ogni push su `main`, `X.Y.Z` e release con lo zip di installazione
+  a ogni tag `vX.Y.Z`.
+- Linux: `network_mode: host`. Windows (Docker Desktop): rete bridge con la porta 8080 pubblicata.
+- Cartelle persistenti: configurazione (`/etc/iot-solar`) e dati (`/var/opt/iot-solar`).
+- Aggiornamento: rilanciare l'installer oppure `docker compose pull && docker compose up -d`.
+
 ## Allarmi
 
 - Isteresi: un'anomalia deve persistere per `persist_cycles` letture prima di aprire l'allarme
@@ -79,8 +117,9 @@ giornata, e convertito in € con il prezzo dell'energia configurato.
 - [x] Simulatore con guasti
 - [ ] Modelli SunSpec float (111/112/113) e contatori (201–204) per l'autoconsumo
 - [ ] Previsione meteo (Open-Meteo) come "sensore virtuale" per gli impianti senza piranometro
-- [ ] Autenticazione utenti (riusare lo schema di iot-weight)
-- [ ] Report PDF mensile di rendimento (WeasyPrint, come iot-weight)
+- [x] Utenti con livelli, configurazione dal web, report PDF mensile, installer Linux/Windows
+- [ ] Invio automatico del report via email a fine mese
+- [ ] Assistenza remota (tunnel SSH come iot-weight)
 
 ### V2 – Gestionale installatore
 - Server cloud multi-impianto: i gateway inviano i dati via MQTT (come `md_message_broker`)

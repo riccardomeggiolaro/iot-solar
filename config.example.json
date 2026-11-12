@@ -1,51 +1,87 @@
 {
-	"log_level": "INFO",
-	"plant": {
-		"name": "Impianto demo",
-		"latitude": 45.41,
-		"longitude": 11.88,
-		"timezone": "Europe/Rome",
-		"energy_price_eur_kwh": 0.22
-	},
-	"polling": {
-		"interval_s": 5,
-		"timeout_s": 3
-	},
-	"devices": [
-		{ "name": "INV-1", "type": "inverter",   "host": "127.0.0.1", "port": 5020, "unit_id": 1,  "kwp": 50 },
-		{ "name": "INV-2", "type": "inverter",   "host": "127.0.0.1", "port": 5020, "unit_id": 2,  "kwp": 50 },
-		{ "name": "INV-3", "type": "inverter",   "host": "127.0.0.1", "port": 5020, "unit_id": 3,  "kwp": 50 },
-		{ "name": "INV-4", "type": "inverter",   "host": "127.0.0.1", "port": 5020, "unit_id": 4,  "kwp": 30 },
-		{ "name": "PIRANOMETRO", "type": "irradiance", "host": "127.0.0.1", "port": 5020, "unit_id": 10 }
-	],
-	"analysis": {
-		"derate": 0.85,
-		"min_irradiance": 150,
-		"min_specific_power": 0.08,
-		"peer_threshold": 0.15,
-		"expected_threshold": 0.20,
-		"overtemp_c": 75,
-		"offline_after_failures": 3,
-		"persist_cycles": 6
-	},
-	"alarms": {
-		"webhook_url": ""
-	},
-	"database": {
-		"path": "data/iot-solar.db",
-		"retention_days": 400
-	},
-	"api": {
-		"host": "0.0.0.0",
-		"port": 8080
-	},
-	"simulator": {
-		"enabled": true,
-		"host": "127.0.0.1",
-		"port": 5020,
-		"speed": 1,
-		"start_hour": null,
-		"clouds": true,
-		"ambient_c": 22
-	}
+    "log_level": "INFO",
+    "plant": {
+        "name": "Impianto demo",
+        "latitude": 45.41,
+        "longitude": 11.88,
+        "timezone": "Europe/Rome",
+        "energy_price_eur_kwh": 0.22,
+        "owner": "",
+        "address": ""
+    },
+    "polling": {
+        "interval_s": 5,
+        "timeout_s": 3
+    },
+    "devices": [
+        {
+            "name": "INV-1",
+            "type": "inverter",
+            "host": "127.0.0.1",
+            "port": 5020,
+            "unit_id": 1,
+            "kwp": 50
+        },
+        {
+            "name": "INV-2",
+            "type": "inverter",
+            "host": "127.0.0.1",
+            "port": 5020,
+            "unit_id": 2,
+            "kwp": 50
+        },
+        {
+            "name": "INV-3",
+            "type": "inverter",
+            "host": "127.0.0.1",
+            "port": 5020,
+            "unit_id": 3,
+            "kwp": 50
+        },
+        {
+            "name": "INV-4",
+            "type": "inverter",
+            "host": "127.0.0.1",
+            "port": 5020,
+            "unit_id": 4,
+            "kwp": 30
+        },
+        {
+            "name": "PIRANOMETRO",
+            "type": "irradiance",
+            "host": "127.0.0.1",
+            "port": 5020,
+            "unit_id": 10
+        }
+    ],
+    "analysis": {
+        "derate": 0.85,
+        "min_irradiance": 150,
+        "min_specific_power": 0.08,
+        "peer_threshold": 0.15,
+        "expected_threshold": 0.2,
+        "overtemp_c": 75,
+        "offline_after_failures": 3,
+        "persist_cycles": 6
+    },
+    "alarms": {
+        "webhook_url": ""
+    },
+    "database": {
+        "retention_days": 400
+    },
+    "api": {
+        "host": "0.0.0.0",
+        "port": 8080,
+        "token_hours": 720
+    },
+    "simulator": {
+        "enabled": true,
+        "host": "127.0.0.1",
+        "port": 5020,
+        "speed": 1,
+        "start_hour": null,
+        "clouds": true,
+        "ambient_c": 22
+    }
 }

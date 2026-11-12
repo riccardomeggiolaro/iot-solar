@@ -16,7 +16,7 @@ from time import monotonic
 from zoneinfo import ZoneInfo
 
 from pymodbus.datastore import ModbusSequentialDataBlock, ModbusServerContext, ModbusSlaveContext
-from pymodbus.server import StartAsyncTcpServer
+from pymodbus.server import ModbusTcpServer
 
 from modules.md_analysis import solar
 from modules.md_sunspec import sunspec
@@ -170,11 +170,14 @@ class PlantSimulator:
 
 	async def run(self, stop_event=None):
 		self.tick()
-		server = asyncio.create_task(StartAsyncTcpServer(context=self.context, address=(self.host, self.port), ignore_missing_slaves=True))
+		server = ModbusTcpServer(self.context, address=(self.host, self.port), ignore_missing_slaves=True)
+		serve = asyncio.create_task(server.serve_forever())
 		log.info("simulatore Modbus avviato su %s:%s (velocità x%s)", self.host, self.port, self.speed)
 		try:
 			while not (stop_event and stop_event.is_set()):
 				await asyncio.sleep(1)
 				self.tick()
 		finally:
-			server.cancel()
+			await server.shutdown()
+			serve.cancel()
+			log.info("simulatore fermato")

@@ -1,7 +1,8 @@
 name: tests
 on:
-  push:
   pull_request:
+  push:
+    branches-ignore: [main]
 jobs:
   pytest:
     runs-on: ubuntu-latest
