@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # ==============================================================
-# IoT-Solar - immagine Docker (linux/amd64 e linux/arm64)
+# KINETRA Energia - immagine Docker (linux/amd64 e linux/arm64)
 # ==============================================================
 FROM python:3.12-slim-bookworm
 

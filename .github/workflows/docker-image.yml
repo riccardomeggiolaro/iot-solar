@@ -1,4 +1,4 @@
-# Costruisce l'immagine Docker di IoT-Solar e la pubblica (privata) su GitHub Container Registry.
+# Costruisce l'immagine Docker di KINETRA Energia e la pubblica (privata) su GitHub Container Registry.
 #
 # - push su main       -> ghcr.io/<owner>/iot-solar:latest (+ :sha-xxxxxxx)
 # - tag vX.Y.Z         -> ghcr.io/<owner>/iot-solar:X.Y.Z, :X.Y, :latest

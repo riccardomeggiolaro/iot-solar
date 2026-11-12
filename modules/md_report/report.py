@@ -26,9 +26,11 @@ ALARM_NAMES = {
 	"UNDERPERF_EXPECTED": "Rendimento sotto l'atteso", "UNDERPERF_PEER": "Rendimento sotto gli altri inverter",
 	"PLANT_UNDERPERF": "Calo di tutto l'impianto",
 }
-ACCENT = colors.HexColor("#e8a317")
+ACCENT = colors.HexColor("#1f5fd6")   # blu KINETRA (come l'interfaccia)
+NAVY = colors.HexColor("#0f1e3d")
+ORANGE = colors.HexColor("#f26a1b")
 GREY = colors.HexColor("#8a96a3")
-DARK = colors.HexColor("#1d2733")
+DARK = colors.HexColor("#17202e")
 LINE = colors.HexColor("#d9dee3")
 RED = colors.HexColor("#c0392b")
 
@@ -116,7 +118,7 @@ def _daily_chart(daily, width):
 	chart.bars.strokeWidth = 0
 	chart.bars.strokeColor = None
 	chart.bars[0].fillColor = ACCENT
-	chart.bars[1].fillColor = colors.HexColor("#c9d0d7")
+	chart.bars[1].fillColor = colors.HexColor("#c5ccd6")
 	drawing.add(chart)
 	legend = Legend()
 	legend.x, legend.y = 14 * mm, height - 3 * mm
@@ -126,7 +128,7 @@ def _daily_chart(daily, width):
 	legend.fontName = "Helvetica"
 	legend.strokeColor = None
 	legend.dx = legend.dy = 7
-	legend.colorNamePairs = [(ACCENT, "Prodotta (kWh)"), (colors.HexColor("#c9d0d7"), "Attesa (kWh)")]
+	legend.colorNamePairs = [(ACCENT, "Prodotta (kWh)"), (colors.HexColor("#c5ccd6"), "Attesa (kWh)")]
 	drawing.add(legend)
 	return drawing
 
@@ -136,7 +138,7 @@ def build_pdf(data):
 	plant = data["plant"]
 	title = f"Report di rendimento – {MONTHS[data['month']]} {data['year']}"
 	doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=16 * mm, rightMargin=16 * mm, topMargin=16 * mm,
-							bottomMargin=18 * mm, title=title, author="IoT-Solar")
+							bottomMargin=18 * mm, title=title, author="KINETRA Energia")
 	ss = getSampleStyleSheet()
 	h1 = ParagraphStyle("h1", parent=ss["Title"], fontSize=17, leading=21, alignment=0, textColor=DARK, spaceAfter=2)
 	h2 = ParagraphStyle("h2", parent=ss["Heading2"], fontSize=11.5, textColor=DARK, spaceBefore=10, spaceAfter=5)
@@ -145,7 +147,8 @@ def build_pdf(data):
 	right = ParagraphStyle("r", parent=small, alignment=TA_RIGHT)
 	width = A4[0] - 32 * mm - 12  # il frame ha 6 pt di margine interno per lato
 
-	story = [Paragraph(title, h1)]
+	brand = ParagraphStyle("brand", parent=body, fontName="Helvetica-Bold", fontSize=10, leading=12, textColor=NAVY)
+	story = [Paragraph('KINETRA <font color="#f26a1b">— ENERGIA</font>', brand), Spacer(1, 4), Paragraph(title, h1)]
 	sub = plant["name"]
 	if plant.get("owner"):
 		sub = f"{plant['owner']} – {sub}"
@@ -215,7 +218,7 @@ def build_pdf(data):
 		canvas.saveState()
 		canvas.setFont("Helvetica", 7.5)
 		canvas.setFillColor(colors.HexColor("#8a96a3"))
-		canvas.drawString(16 * mm, 10 * mm, f"Generato da IoT-Solar il {generated}")
+		canvas.drawString(16 * mm, 10 * mm, f"Generato da KINETRA Energia il {generated}")
 		canvas.drawRightString(A4[0] - 16 * mm, 10 * mm, f"Pagina {doc_.page}")
 		canvas.restoreState()
 

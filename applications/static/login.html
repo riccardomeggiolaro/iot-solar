@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Accesso · KINETRA Energia</title>
+  <link rel="icon" type="image/svg+xml" href="/img/logo.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+  <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+  <link rel="stylesheet" href="/css/app.css">
+  <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+  <main class="login">
+    <form class="card login-card" id="login-form" novalidate>
+      <div class="product-logo">
+        <img src="/img/logo.svg" alt="" width="56" height="56">
+        <div class="product-name"><b>KINETRA</b><span>ENERGIA</span></div>
+      </div>
+      <h1>Accedi</h1>
+      <p class="muted">Inserisci le credenziali per monitorare gli impianti.</p>
+      <label class="login-field">
+        <span>Nome utente</span>
+        <input class="input" id="username" name="username" autocomplete="username" autocapitalize="none" required autofocus>
+      </label>
+      <label class="login-field">
+        <span>Password</span>
+        <input class="input" id="password" name="password" type="password" autocomplete="current-password" required>
+      </label>
+      <p class="login-error" id="login-error" role="alert" hidden></p>
+      <button class="btn primary login-submit" id="login-submit" type="submit">Accedi</button>
+    </form>
+  </main>
+  <script type="module" src="/js/login.js"></script>
+</body>
+</html>

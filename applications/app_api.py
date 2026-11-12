@@ -62,7 +62,7 @@ def _validation_message(e: ValidationError):
 
 
 def create_app(runtime):
-	app = FastAPI(title="IoT-Solar", version=runtime.version)
+	app = FastAPI(title="KINETRA Energia", version=runtime.version)
 	auth = runtime.auth
 
 	# ---- autenticazione ------------------------------------------------
@@ -87,9 +87,14 @@ def create_app(runtime):
 
 	viewer, operator, admin = require(LEVEL_READONLY), require(LEVEL_USER), require(LEVEL_ADMIN)
 
+	# Interfaccia (stessa struttura di KINETRA Pesatura): guscio su "/", accesso su "/login"
 	@app.get("/", include_in_schema=False)
 	async def index():
 		return FileResponse(STATIC / "index.html", headers={"Cache-Control": "no-cache"})
+
+	@app.get("/login", include_in_schema=False)
+	async def login_page():
+		return FileResponse(STATIC / "login.html", headers={"Cache-Control": "no-cache"})
 
 	@app.get("/api/version")
 	async def version():
@@ -101,7 +106,7 @@ def create_app(runtime):
 			token, user = auth.login(req.username, req.password)
 		except AuthError as e:
 			raise HTTPException(401, str(e))
-		return {"token": token, "user": user}
+		return {"access_token": token, "token_type": "bearer", "token": token, "user": user}
 
 	@app.get("/api/auth/me")
 	async def me(user=Depends(current_user)):
@@ -227,5 +232,6 @@ def create_app(runtime):
 		except KeyError:
 			raise HTTPException(404, "Dispositivo sconosciuto")
 
-	app.mount("/static", StaticFiles(directory=STATIC), name="static")
+	for folder in ("css", "js", "img"):
+		app.mount(f"/{folder}", StaticFiles(directory=STATIC / folder), name=folder)
 	return app

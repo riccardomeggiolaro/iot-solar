@@ -38,6 +38,15 @@ class Condition:
 	deficit_w: float = 0.0
 
 
+def _kw(watt):
+	"""Potenza in kW con la virgola decimale, come nell'interfaccia."""
+	return f"{watt / 1000:.1f}".replace(".", ",") + " kW"
+
+
+def _pct(fraction):
+	return f"{fraction:.0%}".replace("%", " %")
+
+
 def _hint_for_deficit(deviation):
 	if deviation >= 0.9:
 		return "Produzione quasi nulla: controllare sezionatori DC, fusibili di stringa e stato inverter."
@@ -113,7 +122,7 @@ def analyze(devices, readings, settings=None):
 			if is_low:
 				below_expected.append(d.name)
 			conditions.append(Condition(d.name, "UNDERPERF_EXPECTED", is_low, "warning",
-										f"{d.name} produce {actual / 1000:.1f} kW, atteso {expected[d.name] / 1000:.1f} kW (-{dev_exp:.0%})",
+										f"{d.name} produce {_kw(actual)}, atteso {_kw(expected[d.name])} (-{_pct(dev_exp)})",
 										_hint_for_deficit(dev_exp), max(expected[d.name] - actual, 0)))
 		else:
 			conditions.append(Condition(d.name, "UNDERPERF_EXPECTED", None))
@@ -123,7 +132,7 @@ def analyze(devices, readings, settings=None):
 			dev_peer = 1 - producing[d.name] / peer_median
 			is_low = dev_peer > cfg["peer_threshold"]
 			conditions.append(Condition(d.name, "UNDERPERF_PEER", is_low, "warning",
-										f"{d.name} rende il {dev_peer:.0%} in meno degli altri inverter",
+										f"{d.name} rende il {_pct(dev_peer)} in meno degli altri inverter",
 										_hint_for_deficit(dev_peer), max(peer_median * d.kwp * 1000 - actual, 0)))
 		else:
 			conditions.append(Condition(d.name, "UNDERPERF_PEER", None))

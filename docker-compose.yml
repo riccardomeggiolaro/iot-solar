@@ -1,4 +1,4 @@
-# IoT-Solar - avvio con:  docker compose pull && docker compose up -d
+# KINETRA Energia - avvio con:  docker compose pull && docker compose up -d
 #
 # network_mode host -> la dashboard risponde sulla porta di config.json (default 8080)
 #                      e gli inverter in rete locale si raggiungono come da installazione nativa

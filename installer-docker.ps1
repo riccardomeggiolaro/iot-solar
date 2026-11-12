@@ -1,6 +1,6 @@
 <#
 ==============================================================
- Installer Docker per IoT-Solar su Windows (Docker Desktop + WSL2)
+ Installer Docker per KINETRA Energia su Windows (Docker Desktop + WSL2)
 
  Uso (PowerShell come Amministratore, dalla cartella estratta da iot-solar-docker.zip):
      Set-ExecutionPolicy -Scope Process Bypass
@@ -101,9 +101,9 @@ $adminPassword = $envMap["IOT_SOLAR_ADMIN_PASSWORD"]
 New-Item -ItemType Directory -Force -Path "docker-data\config","docker-data\data" | Out-Null
 
 # --- 3. Firewall ----------------------------------------------
-if (-not (Get-NetFirewallRule -DisplayName "IoT-Solar HTTP" -ErrorAction SilentlyContinue)) {
-    New-NetFirewallRule -DisplayName "IoT-Solar HTTP" -Direction Inbound -Protocol TCP -LocalPort $httpPort -Action Allow | Out-Null
-    Info "Regola firewall creata: IoT-Solar HTTP (TCP $httpPort)"
+if (-not (Get-NetFirewallRule -DisplayName "KINETRA Energia HTTP" -ErrorAction SilentlyContinue)) {
+    New-NetFirewallRule -DisplayName "KINETRA Energia HTTP" -Direction Inbound -Protocol TCP -LocalPort $httpPort -Action Allow | Out-Null
+    Info "Regola firewall creata: KINETRA Energia HTTP (TCP $httpPort)"
 }
 
 # --- 4. Immagine e avvio --------------------------------------
@@ -139,7 +139,7 @@ for ($i = 0; $i -lt 30; $i++) {
 if (-not $version) { Fail "Il servizio non risponde sulla porta $httpPort`: docker compose logs" }
 
 Write-Host "========================================"
-Write-Host "IoT-Solar $version installato e avviato"
+Write-Host "KINETRA Energia $version installato e avviato"
 Write-Host "========================================"
 Write-Host "Dashboard:  http://localhost:$httpPort/"
 if ($firstInstall) {

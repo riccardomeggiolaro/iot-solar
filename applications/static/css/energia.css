@@ -1,0 +1,72 @@
+/* ── Schermate di KINETRA Energia (con i token di app.css) ── */
+
+.small { font-size: 12px; }
+.nowrap { white-space: nowrap; }
+a.chip { text-decoration: none; }
+.settings-notice a { color: inherit; font-weight: 700; }
+.month-input { width: auto; padding: 8px 10px; }
+
+/* Valori principali */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+.kpi .card-b { padding-top: 6px; }
+.kpi-value { font-size: 30px; font-weight: 750; letter-spacing: -.01em; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.kpi-sub { font-size: 13px; margin-top: 2px; }
+.kpi.loss .kpi-value { color: var(--err); }
+
+/* Dashboard: inverter + allarmi */
+.dash-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr); gap: 14px; align-items: start; }
+.table-card .card-b.dt-scroll { padding: 8px 0 4px; }
+.table-card .dt-table th:first-child, .table-card .dt-table td:first-child { padding-left: 16px; }
+.dt-table td .small { font-weight: 500; }
+
+/* Barra reale / atteso: la tacca è il valore atteso */
+.ratio { display: flex; align-items: center; gap: 8px; min-width: 130px; }
+.ratio-bar { position: relative; flex: 1; height: 8px; border-radius: 999px; background: var(--idle-bg); }
+.ratio-bar i { position: absolute; inset: 0 auto 0 0; border-radius: 999px; background: var(--ok); }
+.ratio-bar i.warn { background: var(--warn); }
+.ratio-bar i.err { background: var(--err); }
+.ratio-bar b { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; background: var(--text); border-radius: 1px; }
+
+/* Allarmi */
+.alarm-list { display: flex; flex-direction: column; gap: 10px; }
+.alarm-item { border: 1px solid var(--border); border-left: 4px solid var(--warn); border-radius: 10px; padding: 10px 12px; background: var(--surface); }
+.alarm-item.err { border-left-color: var(--err); }
+.alarm-t { font-weight: 650; }
+.alarm-h { font-size: 13px; margin-top: 2px; }
+.alarm-m { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; font-size: 12px; margin-top: 6px; }
+
+/* Grafici */
+.chart { width: 100%; min-height: 120px; }
+.chart svg { display: block; max-width: 100%; height: auto; }
+.chart text { fill: var(--text-muted); font-size: 11px; font-family: inherit; }
+.chart .grid { stroke: var(--border); stroke-width: 1; }
+.chart .line { fill: none; stroke-width: 2.5; stroke-linejoin: round; }
+.chart .line.real { stroke: var(--accent); }
+.chart .line.exp { stroke: var(--idle); stroke-width: 2; stroke-dasharray: 6 4; }
+.chart .bar.real { fill: var(--accent); }
+.chart .bar.exp { fill: var(--idle); opacity: .45; }
+.legend { display: flex; gap: 14px; font-size: 12px; color: var(--text-muted); font-weight: 600; }
+.legend span::before { content: ""; display: inline-block; width: 14px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+.legend .lg-real::before { background: var(--accent); }
+.legend .lg-exp::before { background: var(--idle); }
+
+/* Finestre dei dispositivi (come in KINETRA Pesatura) */
+.settings-actions.inline { padding: 12px 0 0; }
+.device-status { font-size: 14px; margin: 8px 0 0; }
+.device-status:empty { display: none; }
+.device-status.ok { color: var(--ok); font-weight: 600; }
+.device-status.err { color: var(--err); font-weight: 600; }
+
+/* Simulatore */
+.sim-form { align-items: end; }
+.sim-form > .btn { justify-self: start; }
+.sim-state { font-size: 13px; margin-top: 10px; }
+
+@media (max-width: 980px) {
+  .dash-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 720px) {
+  .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .kpi-value { font-size: 22px; }
+  .card-h .legend { display: none; }
+}

@@ -1,9 +1,9 @@
-# Architettura IoT-Solar
+# Architettura KINETRA Energia
 
 ## Panoramica
 
 ```
- campo                              gateway IoT-Solar (PC industriale / mini PC / Docker)
+ campo                              gateway KINETRA Energia (PC industriale / mini PC / Docker)
 ┌──────────────┐  Modbus TCP   ┌───────────────────────────────────────────────────────────┐
 │ Inverter 1..N│──────────────▶│ md_inverter  ── SunSpecReader: scoperta modelli, polling   │
 │ (SunSpec)    │               │      │                                                    │
@@ -34,7 +34,8 @@ event loop **asyncio**, senza thread: lettura Modbus, API e simulatore convivono
 | `md_auth` | utenti, password bcrypt, token JWT, livelli | `utils_auth` + middleware |
 | `md_report` | report mensile PDF (reportlab) | `utils_report` (WeasyPrint) |
 | `md_runtime` | schema di config.json, applicazione delle modifiche senza riavvio | `lb_config` |
-| `app_api` | REST + dashboard | `app_api` |
+| `app_api` | REST + pagine web | `app_api` |
+| `static/` | interfaccia: `index.html`, `login.html`, `css/`, `js/` (moduli ES), `img/` | `static/ui-v2` |
 
 ## Acquisizione dati
 
@@ -67,6 +68,17 @@ stringa o MPPT fuori servizio, sotto il 35% sporco/ombra/degrado.
 **Energia persa**: integrale nel tempo di `max(atteso − reale, 0)`, salvato per ogni allarme e per
 giornata, e convertito in € con il prezzo dell'energia configurato.
 
+## Interfaccia
+
+Stessa struttura e stessi componenti di KINETRA Pesatura (`ui-v2` di iot-weight):
+- nessuna compilazione e nessuna libreria esterna (funziona senza internet), moduli JavaScript ES;
+- guscio `index.html` con menu laterale (barra in basso su telefono), barra in alto con titolo e
+  indicatori di stato, tema chiaro/scuro; accesso su `login.html` (`/login`);
+- `css/app.css` (colori come token, layout), `css/data.css` (schede, tabelle, finestre, impostazioni)
+  ripresi da iot-weight; `css/energia.css` contiene solo le parti nuove (valori principali, grafici);
+- `js/api.js` e `js/ui.js` come in iot-weight; `js/plant.js` aggiorna lo stato ogni 5 secondi per
+  barra di stato e schermate; le viste sono in `js/views/` (Dashboard, Allarmi, Report, Impostazioni a schede).
+
 ## Utenti e sicurezza
 
 - Password con bcrypt; sessioni con token JWT (HS256) firmati da una chiave casuale generata al primo
@@ -76,6 +88,7 @@ giornata, e convertito in € con il prezzo dell'energia configurato.
 - Al primo avvio viene creato `admin` con la password di `IOT_SOLAR_ADMIN_PASSWORD`; gli installer la
   generano casuale. Chi ha una password provvisoria deve cambiarla prima di usare le API.
 - Il token viaggia solo nell'header `Authorization`, mai nell'URL; il PDF si scarica con una richiesta autenticata.
+- Il login risponde con `access_token`, come iot-weight.
 - Recupero dell'admin: `python -m modules.md_auth.reset_admin NUOVA_PASSWORD`.
 
 ## Configurazione dal web
