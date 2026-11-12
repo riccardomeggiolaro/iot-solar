@@ -4,13 +4,17 @@ potenza attesa di un impianto. Bastano per la simulazione e per la stima
 della produzione attesa; non sostituiscono un modello di dettaglio (pvlib).
 """
 from datetime import datetime, timezone
-from math import asin, cos, degrees, exp, pi, radians, sin
+from math import acos, cos, degrees, exp, pi, radians, sin
 
 DEFAULT_TEMP_COEFF = -0.0037  # %/°C tipico del silicio cristallino
 
 
-def sun_elevation_deg(latitude, longitude, when):
-	"""Elevazione del sole in gradi (formule NOAA). `when` aware o UTC naive."""
+def sun_position(latitude, longitude, when):
+	"""
+	Posizione del sole (formule NOAA): (elevazione, azimut) in gradi.
+	Azimut misurato da nord in senso orario (90 = est, 180 = sud, 270 = ovest).
+	`when` aware oppure UTC naive.
+	"""
 	if when.tzinfo is not None:
 		when = when.astimezone(timezone.utc)
 	doy = when.timetuple().tm_yday
@@ -23,8 +27,22 @@ def sun_elevation_deg(latitude, longitude, when):
 	true_solar_min = hour * 60 + eqtime + 4 * longitude
 	ha = radians(true_solar_min / 4 - 180)
 	lat = radians(latitude)
-	cos_zen = sin(lat) * sin(decl) + cos(lat) * cos(decl) * cos(ha)
-	return degrees(asin(max(-1.0, min(1.0, cos_zen))))
+	cos_zen = max(-1.0, min(1.0, sin(lat) * sin(decl) + cos(lat) * cos(decl) * cos(ha)))
+	zen = acos(cos_zen)
+	elevation = 90 - degrees(zen)
+	denom = cos(lat) * sin(zen)
+	if abs(denom) < 1e-9:
+		azimuth = 180.0
+	else:
+		cos_az = max(-1.0, min(1.0, (sin(lat) * cos_zen - sin(decl)) / denom))
+		az = degrees(acos(cos_az))
+		azimuth = (az + 180) % 360 if ha > 0 else (540 - az) % 360
+	return elevation, azimuth
+
+
+def sun_elevation_deg(latitude, longitude, when):
+	"""Elevazione del sole in gradi."""
+	return sun_position(latitude, longitude, when)[0]
 
 
 def clear_sky_ghi(elevation_deg):

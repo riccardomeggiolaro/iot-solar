@@ -10,6 +10,8 @@
   <link rel="stylesheet" href="/css/app.css">
   <link rel="stylesheet" href="/css/data.css">
   <link rel="stylesheet" href="/css/energia.css">
+  <!-- three.js per la vista 3D, incluso nel progetto (funziona senza internet) -->
+  <script type="importmap">{ "imports": { "three": "/js/vendor/three/three.module.min.js" } }</script>
 </head>
 <body>
   <div class="app">
@@ -26,6 +28,10 @@
       <a class="nav-item" href="#/report" data-route="report">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 17v-3M12 17V9M16 17v-5"/></svg>
         Report
+      </a>
+      <a class="nav-item" href="#/impianto" data-route="impianto">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg>
+        Impianto
       </a>
       <div class="spacer"></div>
       <a class="nav-item" href="#/impostazioni" data-route="impostazioni">

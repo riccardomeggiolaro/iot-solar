@@ -11,10 +11,20 @@ import { forcePasswordChange } from './views/impostazioni-utenti.js';
 
 if (!getToken()) logout();
 
+// La vista 3D (three.js) si carica solo quando serve.
+function renderImpiantoLazy(el) {
+  let cleanup = null, gone = false;
+  import('./views/impianto.js')
+    .then(m => { if (!gone) cleanup = m.renderImpianto(el); })
+    .catch(err => { el.innerHTML = `<div class="placeholder"><div class="big">⚠️</div><h2>Vista 3D non disponibile</h2><p class="muted">${esc(err.message)}</p></div>`; });
+  return () => { gone = true; if (typeof cleanup === 'function') cleanup(); };
+}
+
 const ROUTES = {
   dashboard:    { title: 'Dashboard',    render: renderDashboard },
   allarmi:      { title: 'Allarmi',      render: renderAllarmi },
   report:       { title: 'Report',       render: renderReport },
+  impianto:     { title: 'Impianto',     render: renderImpiantoLazy },
   impostazioni: { title: 'Impostazioni', render: renderImpostazioni },
 };
 

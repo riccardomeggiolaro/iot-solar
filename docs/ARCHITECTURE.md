@@ -77,7 +77,14 @@ Stessa struttura e stessi componenti di KINETRA Pesatura (`ui-v2` di iot-weight)
 - `css/app.css` (colori come token, layout), `css/data.css` (schede, tabelle, finestre, impostazioni)
   ripresi da iot-weight; `css/energia.css` contiene solo le parti nuove (valori principali, grafici);
 - `js/api.js` e `js/ui.js` come in iot-weight; `js/plant.js` aggiorna lo stato ogni 5 secondi per
-  barra di stato e schermate; le viste sono in `js/views/` (Dashboard, Allarmi, Report, Impostazioni a schede).
+  barra di stato e schermate; le viste sono in `js/views/` (Dashboard, Allarmi, Report, Impianto 3D,
+  Impostazioni a schede).
+- **Impianto 3D** (`js/views/impianto.js`): three.js 0.163 in `js/vendor/three/` (stessa versione di
+  iot-weight ma incluso nel progetto, non da CDN), caricato solo quando si apre la pagina. Un campo di pannelli
+  per inverter (numero di pannelli = kWp / 400 Wp) con una base colorata per lo stato; inverter, quadro di
+  consegna, sensori; flussi di energia proporzionali alla potenza; sole dalla posizione calcolata dal server
+  (`sun` in `/api/plant`, all'ora simulata se il simulatore è attivo). Le posizioni trascinate restano nel
+  browser (`localStorage`), come in iot-weight.
 
 ## Utenti e sicurezza
 

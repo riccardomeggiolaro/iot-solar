@@ -28,6 +28,16 @@ def test_sun_position_noon_summer_padova():
 	assert solar.clear_sky_ghi(-5) == 0
 
 
+def test_sun_azimuth():
+	# Padova, 21 giugno: mattina a est, mezzogiorno solare a sud, sera a ovest
+	morning = solar.sun_position(45.41, 11.88, datetime(2026, 6, 21, 5, 0, tzinfo=timezone.utc))
+	noon = solar.sun_position(45.41, 11.88, datetime(2026, 6, 21, 11, 15, tzinfo=timezone.utc))
+	evening = solar.sun_position(45.41, 11.88, datetime(2026, 6, 21, 17, 0, tzinfo=timezone.utc))
+	assert 60 < morning[1] < 110
+	assert 170 < noon[1] < 190 and 66 < noon[0] < 69
+	assert 250 < evening[1] < 300
+
+
 def test_peer_comparison_without_sensor():
 	devs = [inv("A"), inv("B"), inv("C"), inv("D", kwp=25)]
 	readings = {"A": reading(30000), "B": reading(29500), "C": reading(18000), "D": reading(15000)}

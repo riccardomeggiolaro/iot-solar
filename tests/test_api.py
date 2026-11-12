@@ -48,7 +48,10 @@ def test_login_required_and_wrong_password(env):
 def test_levels(env):
 	_, client, _ = env
 	h = admin_headers(client)
-	assert client.get("/api/plant", headers=h).status_code == 200
+	plant = client.get("/api/plant", headers=h)
+	assert plant.status_code == 200
+	sun = plant.json()["sun"]
+	assert -90 <= sun["elevation"] <= 90 and 0 <= sun["azimuth"] < 360 and sun["simulated"] is False
 
 	r = client.post("/api/users", headers=h, json={"username": "mario", "password": "123456", "level": 1})
 	assert r.status_code == 200 and r.json()["must_change_password"]

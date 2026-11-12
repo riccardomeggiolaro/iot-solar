@@ -23,6 +23,9 @@ stima **quanti euro si stanno perdendo**, così il manutentore sa subito dove in
   calo uniforme di tutto l'impianto (sporco generalizzato o sensore da pulire).
 - **Perdita in €** per ogni allarme e per la giornata.
 - **Interfaccia web** con la stessa struttura e lo stesso stile di KINETRA Pesatura: menu laterale, barra di stato, tema chiaro/scuro, impostazioni a schede. Funziona anche senza internet, ed è disponibile un'**API REST**.
+- **Vista 3D dell'impianto** (come la pagina Impianto di KINETRA Pesatura): campi di pannelli generati
+  dai kWp e colorati in base allo stato, inverter, quadro, flussi di energia animati, sole nella posizione
+  reale, dettagli al clic, elementi trascinabili. three.js è incluso nel progetto: funziona senza internet.
 - **Utenti con livelli** (sola lettura, utente, amministratore, super admin) come iot-weight.
 - **Configurazione dal web**: impianto, inverter (con pulsante *Prova connessione*), soglie degli
   allarmi. Le modifiche si applicano senza riavviare.

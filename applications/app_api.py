@@ -1,6 +1,7 @@
 """API REST e dashboard web."""
 import time
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException, Request
@@ -8,6 +9,7 @@ from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, ValidationError
 
+from modules.md_analysis import solar
 from modules.md_auth.auth import (LEVEL_ADMIN, LEVEL_NAMES, LEVEL_READONLY, LEVEL_USER, AuthError, public_user)
 from modules.md_inverter.reader import Device, ReadError, SunSpecReader
 from modules.md_report.report import MONTHS, month_data, build_pdf
@@ -151,7 +153,16 @@ def create_app(runtime):
 	# ---- impianto ------------------------------------------------------
 	@app.get("/api/plant")
 	async def plant(user=Depends(viewer)):
-		return {**runtime.monitor.snapshot(), "simulator": runtime.simulator is not None}
+		return {**runtime.monitor.snapshot(), "simulator": runtime.simulator is not None, "sun": _sun()}
+
+	def _sun():
+		"""Posizione del sole per la vista 3D: all'ora simulata se il simulatore è attivo."""
+		plant_cfg = runtime.config["plant"]
+		tz = ZoneInfo(plant_cfg["timezone"])
+		when = runtime.simulator.sim_now() if runtime.simulator else datetime.now(tz)
+		elevation, azimuth = solar.sun_position(plant_cfg["latitude"], plant_cfg["longitude"], when)
+		return {"elevation": round(elevation, 2), "azimuth": round(azimuth, 2),
+				"time": when.astimezone(tz).isoformat(timespec="seconds"), "simulated": runtime.simulator is not None}
 
 	@app.get("/api/devices/{name}/history")
 	async def history(name: str, hours: float = 24, user=Depends(viewer)):
